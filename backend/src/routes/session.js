@@ -22,8 +22,8 @@ router.post('/sessionLogin', async (req, res) => {
     const options = {
       maxAge: expiresIn,
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: true,
+      sameSite: 'None',
     };
 
     res.cookie(process.env.SESSION_COOKIE_NAME, sessionCookie, options);

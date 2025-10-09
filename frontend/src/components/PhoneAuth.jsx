@@ -4,6 +4,8 @@ import { auth } from '../firebaseClient';
 import OTPModal from './OTPModal';
 import { Form, Button, Alert } from 'react-bootstrap';
 import { motion } from 'framer-motion';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 
 const PhoneAuth = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -18,7 +20,7 @@ const PhoneAuth = () => {
       const recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
         'size': 'invisible',
       });
-      const result = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
+      const result = await signInWithPhoneNumber(auth, `+${phoneNumber}`, recaptchaVerifier);
       setConfirmationResult(result);
       setShowOtpModal(true);
     } catch (error) {
@@ -47,16 +49,11 @@ const PhoneAuth = () => {
       <Form onSubmit={handleSignIn}>
         <motion.div variants={itemVariants}>
           <Form.Group className="mb-3" controlId="formBasicPhoneNumber">
-            <Form.Control
-              type="tel"
+            <PhoneInput
+              country={'in'}
               value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              placeholder="Enter phone number"
-              required
+              onChange={setPhoneNumber}
             />
-            <Form.Text className="text-muted">
-              (e.g., +1 1234567890).
-            </Form.Text>
           </Form.Group>
         </motion.div>
 

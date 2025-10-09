@@ -8,7 +8,10 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 const corsOptions = {
-  origin: 'http://localhost:5173', // Frontend URL
+  origin: [
+    'https://fire-auth-mcp.netlify.app', // Production frontend
+    'http://localhost:5173',             // Local testing
+  ],
   credentials: true,
 };
 
@@ -19,5 +22,5 @@ app.use(cookieParser());
 app.use('/api', sessionRoutes);
 
 app.listen(port, () => {
-  console.log(`Server listening at http://localhost:${port}`);
+  console.log(`✅ Server running on port ${port}`);
 });
