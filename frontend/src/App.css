@@ -152,3 +152,11 @@ body {
   background-position: center;
   background-repeat: no-repeat;
 }
+
+.chat-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 400px;
+  z-index: 1000;
+}

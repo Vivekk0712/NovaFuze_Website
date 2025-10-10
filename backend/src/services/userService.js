@@ -4,6 +4,8 @@ const db = admin.firestore();
 
 async function upsertFromDecodedToken(decodedToken) {
   const { uid, email, phone_number, name, picture } = decodedToken;
+  console.log('DEBUG: upsertFromDecodedToken called with:', { uid, email, phone_number, name, picture });
+  
   const userRef = db.collection('users').doc(uid);
   const userDoc = await userRef.get();
 
@@ -16,6 +18,8 @@ async function upsertFromDecodedToken(decodedToken) {
   if (phone_number) userData.phoneNumber = phone_number;
   if (name) userData.displayName = name;
   if (picture) userData.photoURL = picture;
+  
+  console.log('DEBUG: userData to be saved:', userData);
 
   if (!userDoc.exists) {
     userData.createdAt = new Date().toISOString();

@@ -2,6 +2,7 @@ const express = require('express');
 const admin = require('../firebase');
 const { upsertFromDecodedToken } = require('../services/userService');
 const verifySession = require('../middleware/verifySession');
+const axios = require('axios');
 
 const router = express.Router();
 
@@ -62,6 +63,62 @@ router.get('/me', verifySession, async (req, res) => {
     }
 
     res.json(userDoc.data());
+});
+
+router.post('/chat', verifySession, async (req, res) => {
+  const { message, metadata } = req.body;
+  const firebaseUid = req.user.uid;
+  
+  // Get user information from Firebase token
+  console.log('Firebase token user data:', JSON.stringify(req.user, null, 2));
+  let userName = req.user.displayName || req.user.name || null;
+  let userEmail = req.user.email || null;
+  
+  // If name/email not in token, try to get from Firestore
+  if (!userName || !userEmail) {
+    try {
+      const userRef = admin.firestore().collection('users').doc(firebaseUid);
+      const userDoc = await userRef.get();
+      
+      if (userDoc.exists) {
+        const userData = userDoc.data();
+        console.log('Firestore user data:', userData);
+        userName = userName || userData.displayName || userData.name || null;
+        userEmail = userEmail || userData.email || null;
+      }
+    } catch (error) {
+      console.error('Error fetching user from Firestore:', error);
+    }
+  }
+  
+  console.log('Final extracted - Name:', userName, 'Email:', userEmail);
+
+  try {
+    const mcpResponse = await axios.post(process.env.MCP_SERVER_URL + '/mcp/query', {
+      user_id: firebaseUid,
+      message,
+      metadata,
+      user_name: userName,
+      user_email: userEmail,
+    });
+
+    res.json(mcpResponse.data);
+  } catch (error) {
+    console.error('Error forwarding chat to MCP server:', error);
+    res.status(500).json({ error: { code: 'MCP_SERVER_ERROR', message: 'Error forwarding chat to MCP server' } });
+  }
+});
+
+router.get('/history', verifySession, async (req, res) => {
+  const firebaseUid = req.user.uid;
+
+  try {
+    const mcpResponse = await axios.get(process.env.MCP_SERVER_URL + '/mcp/history?user_id=' + firebaseUid);
+    res.json(mcpResponse.data);
+  } catch (error) {
+    console.error('Error fetching chat history from MCP server:', error);
+    res.status(500).json({ error: { code: 'MCP_SERVER_ERROR', message: 'Error fetching chat history from MCP server' } });
+  }
 });
 
 module.exports = router;
