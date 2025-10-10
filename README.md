@@ -1,6 +1,6 @@
-# Firebase Auth App — Phone, Google & Email/Password
+# Firebase Auth App — Phone, Google & Email/Password with AI Chat
 
-A minimal authentication system built with React (frontend), Node.js + Express (backend), and Firebase Authentication. Supports Phone OTP, Google Sign-In, and Email/Password with account linking. Uses session cookies for secure persistence and stores user profiles in Firestore.
+A full-stack authentication system with AI-powered chat functionality. Built with React (frontend), Node.js + Express (backend), Python FastAPI (MCP server), Firebase Authentication, and Supabase database. Supports Phone OTP, Google Sign-In, and Email/Password with account linking, plus a ChatGPT-style AI assistant.
 
 ## Features
 
@@ -10,13 +10,20 @@ A minimal authentication system built with React (frontend), Node.js + Express (
 - Account linking (phone + Google + email)
 - Secure session cookies (HttpOnly, Secure, SameSite=Strict)
 - Firestore rules enforce per-user isolation
+- **AI Chat Assistant** powered by Gemini 2.5 Pro
+- **ChatGPT-style conversation management** with sidebar
+- **Conversation isolation** - each chat maintains separate context
+- **User-aware AI** - AI knows your name and profile information
 - Ready for Firebase Emulator Suite
 
 ## Prerequisites
 
 - Node.js >= 18
+- Python 3.10+ and pip
 - A Firebase project (the free tier is sufficient)
+- A Supabase account (for database)
 - Firebase CLI (`npm install -g firebase-tools`)
+- Gemini API key (for AI functionality)
 
 ## Getting Started
 
@@ -32,8 +39,17 @@ cd my-auth-app
 ### 2. Install Dependencies
 
 ```bash
+# Backend
 cd backend && npm install
+
+# Frontend
 cd ../frontend && npm install
+
+# MCP Server (Python)
+cd ../mcp_server
+python -m venv venv
+source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+pip install -r requirements.txt
 ```
 
 ### 3. Firebase Project Setup
@@ -71,19 +87,28 @@ cd ../frontend && npm install
 1.  In the Firebase Console, go to the **Firestore Database** section.
 2.  Click "Create database" and start in **test mode**.
 
-### 4. Configure Environment Variables
+### 4. Supabase Database Setup
 
-Create a `.env` file in both the `frontend` and `backend` directories. You can copy the contents from the `.env.example` files.
+#### a. Create a Supabase Project
+1. Go to the [Supabase Dashboard](https://app.supabase.io/) and create a new project.
+2. Once the project is created, navigate to the **Project Settings** > **API** section.
+3. You will need two pieces of information from this page for your `.env` files:
+   - **Project URL** (looks like `https://<your-project-ref>.supabase.co`)
+   - **Service Role Key** (under "Project API keys"). This key bypasses Row Level Security and should be kept secret.
 
-**`backend/.env`**
-```
-PORT=4000
-FIREBASE_PROJECT_ID=your-project-id
-GOOGLE_APPLICATION_CREDENTIALS=./serviceAccount.json
-SESSION_COOKIE_NAME=__session
-SESSION_EXPIRES_IN=432000000   # 5 days in ms
-NODE_ENV=development
-```
+#### b. Create Database Schema
+1. In your Supabase project, go to the **SQL Editor**.
+2. Click on **New query**.
+3. Copy the entire content of the `mcp_server/db/schema.sql` file and paste it into the SQL editor.
+4. Click **Run** to execute the script. This will create the `users`, `conversations`, `messages`, and `embeddings` tables.
+
+### 5. Gemini API Setup
+1. Go to the [Google AI Studio](https://aistudio.google.com/) to get your Gemini API key.
+2. Create a new API key and copy it - you'll need this for the MCP server configuration.
+
+### 6. Configure Environment Variables
+
+Create a `.env` file in the `frontend`, `backend`, and `mcp_server` directories.
 
 **`frontend/.env`**
 ```
@@ -95,7 +120,26 @@ VITE_FIREBASE_APP_ID=your-app-id
 VITE_RECAPTCHA_SITE_KEY=your-recaptcha-site-key-from-step-3e
 ```
 
-### 5. Deploy Firestore Rules
+**`backend/.env`**
+```
+PORT=4000
+FIREBASE_PROJECT_ID=your-project-id
+GOOGLE_APPLICATION_CREDENTIALS=./serviceAccount.json
+SESSION_COOKIE_NAME=__session
+SESSION_EXPIRES_IN=432000000   # 5 days in ms
+MCP_SERVER_URL=http://localhost:8000
+NODE_ENV=development
+```
+
+**`mcp_server/.env`**
+```
+SUPABASE_URL=your-supabase-project-url
+SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
+GEMINI_API_KEY=your-gemini-api-key
+NODE_ENV=development
+```
+
+### 7. Deploy Firestore Rules
 
 To deploy the security rules for Firestore, run the following command from the root of the project:
 
@@ -105,17 +149,29 @@ firebase deploy --only firestore:rules
 
 ## Running the Application
 
-### Start Backend
+You need to run all three services simultaneously in separate terminals.
+
+### Start the Backend
 ```bash
 cd backend
 npm run dev
 ```
+The backend server will start on `http://localhost:4000`.
 
-### Start Frontend
+### Start the MCP Server
+```bash
+cd mcp_server
+source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+uvicorn main:app --reload
+```
+The MCP server will start on `http://localhost:8000`.
+
+### Start the Frontend
 ```bash
 cd frontend
 npm run dev
 ```
+The frontend development server will start, usually on `http://localhost:5173`.
 
 ### Run with Firebase Emulator
 To develop locally without connecting to your live Firebase project, you can use the Firebase Emulator Suite.
@@ -130,8 +186,17 @@ firebase emulators:start --only auth,firestore
 /my-auth-app
   /backend
     /src
+      /routes
+      /middleware
+      /services
   /frontend
     /src
+      /components
+      /pages
+      /services
+  /mcp_server
+    /tools
+    /db
   /docs
   README.md
   firebase.json
@@ -150,11 +215,24 @@ firebase emulators:start --only auth,firestore
 - Strong password policy for email/password
 - Firestore rules prevent cross-user access
 
+## AI Chat Features
+
+- **Gemini 2.5 Pro Integration**: Powered by Google's latest AI model
+- **Conversation Management**: ChatGPT-style sidebar with conversation history
+- **Context Isolation**: Each conversation maintains separate context
+- **User Awareness**: AI knows your name and profile information
+- **Message History**: Persistent chat history stored in Supabase
+- **Real-time Chat**: Instant responses with loading indicators
+- **Fullscreen Mode**: Immersive chat experience
+- **Conversation CRUD**: Create, switch, and delete conversations
+
 ## Roadmap
 
 - Password reset & email verification
 - Roles (admin/user)
 - Multi-factor auth (MFA)
+- AI conversation search and filtering
+- Message export functionality
 - Deployment (Netlify + Render/Cloud Run)
 
 ## License
