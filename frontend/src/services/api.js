@@ -25,4 +25,8 @@ export const sendMessage = (message, metadata) => {
   return api.post('/api/chat', { message, metadata });
 };
 
+export const clearChat = () => {
+  return api.delete('/api/clear-chat');
+};
+
 export default api;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Form, Button, Card, Spinner } from 'react-bootstrap';
-import { X, Fullscreen, FullscreenExit } from 'react-bootstrap-icons';
-import { getHistory, sendMessage } from '../services/api';
+import { Form, Button, Card, Spinner, InputGroup } from 'react-bootstrap';
+import { X, Fullscreen, FullscreenExit, Trash } from 'react-bootstrap-icons';
+import { getHistory, sendMessage, clearChat } from '../services/api';
 
 const ChatBot = ({ user, onToggleFullscreen, isFullscreen = false }) => {
   const [message, setMessage] = useState('');
@@ -79,6 +79,26 @@ const ChatBot = ({ user, onToggleFullscreen, isFullscreen = false }) => {
     }
   };
 
+  const handleClearChat = async () => {
+    if (window.confirm('Are you sure you want to clear all chat history? This action cannot be undone.')) {
+      try {
+        setLoading(true);
+        await clearChat();
+        setChatHistory([]);
+        // Also clear localStorage
+        if (user?.uid) {
+          localStorage.removeItem(`chatHistory_${user.uid}`);
+        }
+        console.log('Chat history cleared successfully');
+      } catch (error) {
+        console.error('Error clearing chat history:', error);
+        alert('Failed to clear chat history. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
+
   const chatContainerStyle = {
     height: isFullscreen ? 'calc(100vh - 120px)' : '400px',
     overflowY: 'auto',
@@ -131,7 +151,18 @@ const ChatBot = ({ user, onToggleFullscreen, isFullscreen = false }) => {
     } : {}}>
       <Card.Header className="d-flex justify-content-between align-items-center">
         <h5 className="mb-0">Chat Assistant</h5>
-        <div>
+        <div className="d-flex gap-2">
+          {chatHistory.length > 0 && (
+            <Button 
+              variant="outline-danger" 
+              size="sm" 
+              onClick={handleClearChat}
+              disabled={loading}
+              title="Clear chat history"
+            >
+              <Trash size={16} />
+            </Button>
+          )}
           <Button 
             variant="link" 
             size="sm" 
@@ -190,24 +221,23 @@ const ChatBot = ({ user, onToggleFullscreen, isFullscreen = false }) => {
         </div>
         
         <Form onSubmit={handleSendMessage}>
-          <Form.Group className="mb-3">
+          <InputGroup>
             <Form.Control
               type="text"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Type your message..."
-              style={{ borderRadius: '20px' }}
+              style={{ borderRadius: '20px 0 0 20px' }}
               disabled={loading}
             />
-          </Form.Group>
-          <Button 
-            type="submit" 
-            disabled={loading || !message.trim()} 
-            className="w-100" 
-            style={{ borderRadius: '20px' }}
-          >
-            {loading ? 'Sending...' : 'Send'}
-          </Button>
+            <Button 
+              type="submit" 
+              disabled={loading || !message.trim()} 
+              style={{ borderRadius: '0 20px 20px 0' }}
+            >
+              {loading ? 'Sending...' : 'Send'}
+            </Button>
+          </InputGroup>
         </Form>
       </Card.Body>
     </Card>

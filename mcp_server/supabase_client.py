@@ -57,11 +57,25 @@ def store_message(user_id: str, role: str, content: str, metadata: dict = None):
     response = supabase.table('messages').insert(message_data).execute()
     return response.data[0]
 
-def get_recent_messages(user_id: str, limit: int = 10):
+def get_recent_messages(user_id: str, limit: int = None):
     # Get the most recent messages (newest first)
-    response = supabase.table('messages').select('*').eq('user_id', user_id).order('created_at', desc=True).limit(limit).execute()
+    query = supabase.table('messages').select('*').eq('user_id', user_id).order('created_at', desc=True)
+    
+    if limit:
+        query = query.limit(limit)
+    
+    response = query.execute()
     print(f"DEBUG: Raw database response: {response.data}")
     # Reverse to get chronological order (oldest first)
     reversed_data = list(reversed(response.data))
     print(f"DEBUG: Reversed data: {reversed_data}")
     return reversed_data
+
+def clear_user_messages(user_id: str):
+    """
+    Deletes all messages for a specific user.
+    """
+    print(f"DEBUG: Clearing all messages for user_id: {user_id}")
+    response = supabase.table('messages').delete().eq('user_id', user_id).execute()
+    print(f"DEBUG: Clear messages response: {response}")
+    return response

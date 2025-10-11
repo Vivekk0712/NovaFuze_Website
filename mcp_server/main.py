@@ -94,6 +94,17 @@ async def mcp_history(user_id: str):
         logger.error(f"Error fetching chat history for user {user_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
+@app.delete("/mcp/clear-chat")
+async def mcp_clear_chat(user_id: str):
+    logger.info(f"Clearing chat history for user {user_id}")
+    try:
+        result = chat_tools.clear_chat_history(user_id)
+        logger.info(f"Successfully cleared chat history for user {user_id}")
+        return {"message": "Chat history cleared successfully", "result": result}
+    except Exception as e:
+        logger.error(f"Error clearing chat history for user {user_id}: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))

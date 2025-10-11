@@ -121,4 +121,16 @@ router.get('/history', verifySession, async (req, res) => {
   }
 });
 
+router.delete('/clear-chat', verifySession, async (req, res) => {
+  const firebaseUid = req.user.uid;
+
+  try {
+    const mcpResponse = await axios.delete(process.env.MCP_SERVER_URL + '/mcp/clear-chat?user_id=' + firebaseUid);
+    res.json(mcpResponse.data);
+  } catch (error) {
+    console.error('Error clearing chat history from MCP server:', error);
+    res.status(500).json({ error: { code: 'MCP_SERVER_ERROR', message: 'Error clearing chat history from MCP server' } });
+  }
+});
+
 module.exports = router;
