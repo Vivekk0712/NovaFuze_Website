@@ -24,6 +24,7 @@ import { ProductDetailPage } from "./ProductDetailPage"
 import { PrivacyPolicyPage } from "./PrivacyPolicyPage"
 import { TermsOfServicePage } from "./TermsOfServicePage"
 import { RefundPolicyPage } from "./RefundPolicyPage"
+import AdminPage from "../pages/AdminPage"
 
 export type Route = 
   | "home" 
@@ -35,6 +36,7 @@ export type Route =
   | "careers"
   | "portfolio"
   | "contact"
+  | "admin"
   // Service detail pages
   | "services/web-development"
   | "services/mobile-development"
@@ -135,6 +137,9 @@ export function Router({ onRouteChange }: RouterProps) {
       
       case "contact":
         return <ContactPage />
+      
+      case "admin":
+        return <AdminPage />
       
       // Legal pages
       case "legal/privacy":

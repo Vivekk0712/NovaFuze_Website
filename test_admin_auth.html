@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Auth Test</title>
+</head>
+<body>
+    <h1>Admin Authentication Test</h1>
+    <div id="status"></div>
+    <button onclick="testAdminAuth()">Test Admin Auth</button>
+    <button onclick="clearAdminData()">Clear Admin Data</button>
+    
+    <script>
+        function testAdminAuth() {
+            const token = localStorage.getItem('admin_token');
+            const user = localStorage.getItem('admin_user');
+            
+            document.getElementById('status').innerHTML = `
+                <p>Token: ${token ? 'Present' : 'Missing'}</p>
+                <p>User: ${user ? 'Present' : 'Missing'}</p>
+                <p>User Data: ${user || 'None'}</p>
+            `;
+        }
+        
+        function clearAdminData() {
+            localStorage.removeItem('admin_token');
+            localStorage.removeItem('admin_user');
+            document.getElementById('status').innerHTML = '<p>Admin data cleared</p>';
+        }
+    </script>
+</body>
+</html>

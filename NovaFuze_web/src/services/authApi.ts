@@ -29,4 +29,27 @@ export const clearChat = () => {
   return api.delete('/api/clear-chat');
 };
 
+// File management functions
+export const uploadPdf = (file: File) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  return api.post('/api/upload-pdf', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+};
+
+export const getUserFiles = () => {
+  return api.get('/api/files');
+};
+
+export const deleteFile = (fileId: string) => {
+  return api.delete(`/api/files/${fileId}`);
+};
+
+export const searchFiles = (query: string) => {
+  return api.post('/api/search-files', { query });
+};
+
 export default api;

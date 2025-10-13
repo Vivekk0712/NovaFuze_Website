@@ -32,7 +32,8 @@ const EmailAuth = () => {
       }
       const idToken = await userCredential.user.getIdToken();
       await sessionLogin(idToken);
-      window.location.reload(); // Reload to fetch user session
+      window.location.hash = '#home'; // Set hash to home
+      window.location.reload(); // Force page reload to establish session
     } catch (error: any) {
       setError(error.message);
     }

@@ -3,8 +3,24 @@ const admin = require('../firebase');
 const { upsertFromDecodedToken } = require('../services/userService');
 const verifySession = require('../middleware/verifySession');
 const axios = require('axios');
+const multer = require('multer');
 
 const router = express.Router();
+
+// Configure multer for file uploads
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === 'application/pdf') {
+      cb(null, true);
+    } else {
+      cb(new Error('Only PDF files are allowed'), false);
+    }
+  }
+});
 
 router.post('/sessionLogin', async (req, res) => {
   const { idToken } = req.body;
@@ -130,6 +146,180 @@ router.delete('/clear-chat', verifySession, async (req, res) => {
   } catch (error) {
     console.error('Error clearing chat history from MCP server:', error);
     res.status(500).json({ error: { code: 'MCP_SERVER_ERROR', message: 'Error clearing chat history from MCP server' } });
+  }
+});
+
+// File Upload Routes
+router.post('/upload-pdf', verifySession, upload.single('file'), async (req, res) => {
+  const firebaseUid = req.user.uid;
+
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: { code: 'BAD_REQUEST', message: 'No file uploaded' } });
+    }
+
+    // Create FormData for MCP server
+    const FormData = require('form-data');
+    const formData = new FormData();
+    formData.append('file', req.file.buffer, {
+      filename: req.file.originalname,
+      contentType: req.file.mimetype
+    });
+
+    const mcpResponse = await axios.post(
+      process.env.MCP_SERVER_URL + '/mcp/upload-pdf?user_id=' + firebaseUid,
+      formData,
+      {
+        headers: {
+          ...formData.getHeaders(),
+        },
+        maxContentLength: Infinity,
+        maxBodyLength: Infinity
+      }
+    );
+    res.json(mcpResponse.data);
+  } catch (error) {
+    console.error('Error uploading PDF to MCP server:', error);
+    res.status(500).json({ error: { code: 'MCP_SERVER_ERROR', message: 'Error uploading PDF to MCP server' } });
+  }
+});
+
+router.get('/files', verifySession, async (req, res) => {
+  const firebaseUid = req.user.uid;
+
+  try {
+    const mcpResponse = await axios.get(process.env.MCP_SERVER_URL + '/mcp/files?user_id=' + firebaseUid);
+    res.json(mcpResponse.data);
+  } catch (error) {
+    console.error('Error fetching files from MCP server:', error);
+    res.status(500).json({ error: { code: 'MCP_SERVER_ERROR', message: 'Error fetching files from MCP server' } });
+  }
+});
+
+router.delete('/files/:fileId', verifySession, async (req, res) => {
+  const firebaseUid = req.user.uid;
+  const { fileId } = req.params;
+
+  try {
+    const mcpResponse = await axios.delete(process.env.MCP_SERVER_URL + `/mcp/files/${fileId}?user_id=${firebaseUid}`);
+    res.json(mcpResponse.data);
+  } catch (error) {
+    console.error('Error deleting file from MCP server:', error);
+    res.status(500).json({ error: { code: 'MCP_SERVER_ERROR', message: 'Error deleting file from MCP server' } });
+  }
+});
+
+router.post('/search-files', verifySession, async (req, res) => {
+  const firebaseUid = req.user.uid;
+  const { query } = req.body;
+
+  try {
+    const mcpResponse = await axios.post(
+      process.env.MCP_SERVER_URL + '/mcp/search-files?user_id=' + firebaseUid,
+      { query }
+    );
+    res.json(mcpResponse.data);
+  } catch (error) {
+    console.error('Error searching files from MCP server:', error);
+    res.status(500).json({ error: { code: 'MCP_SERVER_ERROR', message: 'Error searching files from MCP server' } });
+  }
+});
+
+// Admin Routes (no session verification - admin auth handled by MCP server)
+router.post('/admin/login', async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const mcpResponse = await axios.post(process.env.MCP_SERVER_URL + '/admin/login', {
+      email,
+      password
+    });
+    res.json(mcpResponse.data);
+  } catch (error) {
+    console.error('Error with admin login:', error);
+    res.status(500).json({ error: { code: 'ADMIN_LOGIN_ERROR', message: 'Error with admin login' } });
+  }
+});
+
+router.post('/admin/create', async (req, res) => {
+  const { email, password, name } = req.body;
+
+  try {
+    const mcpResponse = await axios.post(process.env.MCP_SERVER_URL + '/admin/create', {
+      email,
+      password,
+      name
+    });
+    res.json(mcpResponse.data);
+  } catch (error) {
+    console.error('Error creating admin:', error);
+    res.status(500).json({ error: { code: 'ADMIN_CREATE_ERROR', message: 'Error creating admin' } });
+  }
+});
+
+router.get('/admin/files', async (req, res) => {
+  const { authorization } = req.headers;
+
+  try {
+    const mcpResponse = await axios.get(process.env.MCP_SERVER_URL + '/admin/files', {
+      headers: {
+        'Authorization': authorization
+      }
+    });
+    res.json(mcpResponse.data);
+  } catch (error) {
+    console.error('Error fetching admin files:', error);
+    res.status(500).json({ error: { code: 'ADMIN_FILES_ERROR', message: 'Error fetching admin files' } });
+  }
+});
+
+router.get('/admin/files/:fileId', async (req, res) => {
+  const { fileId } = req.params;
+  const { authorization } = req.headers;
+
+  try {
+    const mcpResponse = await axios.get(process.env.MCP_SERVER_URL + `/admin/files/${fileId}`, {
+      headers: {
+        'Authorization': authorization
+      }
+    });
+    res.json(mcpResponse.data);
+  } catch (error) {
+    console.error('Error fetching admin file details:', error);
+    res.status(500).json({ error: { code: 'ADMIN_FILE_ERROR', message: 'Error fetching admin file details' } });
+  }
+});
+
+router.delete('/admin/files/:fileId', async (req, res) => {
+  const { fileId } = req.params;
+  const { authorization } = req.headers;
+
+  try {
+    const mcpResponse = await axios.delete(process.env.MCP_SERVER_URL + `/admin/files/${fileId}`, {
+      headers: {
+        'Authorization': authorization
+      }
+    });
+    res.json(mcpResponse.data);
+  } catch (error) {
+    console.error('Error deleting admin file:', error);
+    res.status(500).json({ error: { code: 'ADMIN_FILE_DELETE_ERROR', message: 'Error deleting admin file' } });
+  }
+});
+
+router.get('/admin/stats', async (req, res) => {
+  const { authorization } = req.headers;
+
+  try {
+    const mcpResponse = await axios.get(process.env.MCP_SERVER_URL + '/admin/stats', {
+      headers: {
+        'Authorization': authorization
+      }
+    });
+    res.json(mcpResponse.data);
+  } catch (error) {
+    console.error('Error fetching admin stats:', error);
+    res.status(500).json({ error: { code: 'ADMIN_STATS_ERROR', message: 'Error fetching admin stats' } });
   }
 });
 

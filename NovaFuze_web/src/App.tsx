@@ -7,10 +7,35 @@ import { ThemeProvider } from "./components/ThemeProvider"
 import { Toaster } from "./components/ui/sonner"
 import { ErrorBoundary } from "./components/ErrorBoundary"
 import { useAuth } from "./hooks/useAuth"
+import { useAdminAuth } from "./hooks/useAdminAuth"
 import LoginPage from "./pages/LoginPage"
+import { useEffect } from "react"
 
 export default function App() {
   const { user, loading } = useAuth();
+  const { isAdminAuthenticated, admin } = useAdminAuth();
+
+  // Redirect to home page when user logs in
+  useEffect(() => {
+    if (user && !loading) {
+      // Clear any stored route information
+      sessionStorage.removeItem('lastRoute');
+      localStorage.removeItem('lastRoute');
+      
+      // Always force home page
+      if (window.location.hash !== '#home') {
+        console.log('Forcing home page redirect');
+        window.location.hash = '#home';
+        
+        // If hash doesn't change, force a reload
+        setTimeout(() => {
+          if (window.location.hash !== '#home') {
+            window.location.reload();
+          }
+        }, 100);
+      }
+    }
+  }, [user, loading]);
 
   if (loading) {
     return (
@@ -34,6 +59,7 @@ export default function App() {
     );
   }
 
+
   return (
     <ThemeProvider defaultTheme="light" storageKey="novafuze-tech-ui-theme">
       <ErrorBoundary>
@@ -47,6 +73,17 @@ export default function App() {
           <Footer />
           <SupportWidget />
           <MCPToggle user={user} />
+          
+          {/* Admin Link - Always visible to all users */}
+          <div className="fixed bottom-20 left-6 z-50 hidden md:block">
+            <a
+              href="#admin"
+              className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm block shadow-xl hover:shadow-2xl transition-all duration-300"
+            >
+              Admin Panel
+            </a>
+          </div>
+
           <Toaster />
         </div>
       </ErrorBoundary>
