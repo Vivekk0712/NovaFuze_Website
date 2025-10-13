@@ -1,0 +1,44 @@
+{
+  "name": "novafuze-website",
+  "version": "1.0.0",
+  "description": "NovaFuze official website - AI-first web and mobile development",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "export": "next build && next export",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "^14.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "@next/font": "^14.0.0",
+    "next-seo": "^6.4.0",
+    "sharp": "^0.32.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "eslint": "^8.0.0",
+    "eslint-config-next": "^14.0.0",
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "novafuze",
+    "web development", 
+    "mobile development",
+    "AI solutions",
+    "bangalore",
+    "startup development"
+  ],
+  "author": "NovaFuze <support@novafuze.in>",
+  "homepage": "https://novafuze.in",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/novafuze/website"
+  }
+}

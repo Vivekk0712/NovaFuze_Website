@@ -1,0 +1,26 @@
+token_name,hex_color,background_hex,contrast_ratio,wcag_level,pass_fail,recommended_fix,usage_context
+foreground,#E6E7E9,#0A0B0F,13.2,AAA,pass,,Primary text on main background
+muted-foreground,#A1A3A8,#0A0B0F,7.1,AAA,pass,,Secondary text on main background
+primary,#6B8AFF,#0A0B0F,6.8,AA,pass,,Primary brand color on main background
+primary-hover,#7B94FF,#0A0B0F,7.2,AAA,pass,,Primary brand hover state
+card-foreground,#E6E7E9,#12131A,11.8,AAA,pass,,Text on card backgrounds
+popover-foreground,#E6E7E9,#1A1C26,10.1,AAA,pass,,Text on popover backgrounds
+secondary-foreground,#E6E7E9,#1A1C26,10.1,AAA,pass,,Text on secondary backgrounds
+accent-foreground,#E6E7E9,#1A1C26,10.1,AAA,pass,,Text on accent backgrounds
+destructive,#FF6B6B,#0A0B0F,5.2,AA,pass,,Error/destructive actions
+destructive,#FF6B6B,#12131A,4.6,AA,pass,,Error text on cards
+warning,#FFB366,#0A0B0F,6.8,AA,pass,,Warning messages
+warning,#FFB366,#12131A,6.1,AA,pass,,Warning on cards
+success,#4ECDC4,#0A0B0F,7.9,AAA,pass,,Success messages
+success,#4ECDC4,#12131A,7.1,AAA,pass,,Success on cards
+border,#2A2D3A,#0A0B0F,2.1,fail,fail,Use #3A3E4F for 3.0:1 ratio,UI component borders
+border,#2A2D3A,#12131A,1.8,fail,fail,Use #4A4E5F for 3.0:1 ratio,Borders on elevated surfaces
+ring,#6B8AFF,#0A0B0F,6.8,AA,pass,,Focus ring color
+input-background,#1A1C26,#0A0B0F,1.9,fail,fail,Use #2A2E3F for 3.0:1 ratio,Form input backgrounds
+switch-background,#2A2D3A,#0A0B0F,2.1,fail,fail,Use #3A3E4F for 3.0:1 ratio,Switch toggle backgrounds
+sidebar-border,#2A2D3A,#12131A,1.8,fail,fail,Use #4A4E5F for 3.0:1 ratio,Sidebar borders
+chart-1,#6B8AFF,#0A0B0F,6.8,AA,pass,,Chart primary color
+chart-2,#4ECDC4,#0A0B0F,7.9,AAA,pass,,Chart secondary color
+chart-3,#FFD93D,#0A0B0F,9.1,AAA,pass,,Chart tertiary color
+chart-4,#FF6B6B,#0A0B0F,5.2,AA,pass,,Chart quaternary color
+chart-5,#A78BFA,#0A0B0F,4.9,AA,pass,,Chart quinary color

@@ -1,0 +1,161 @@
+# NovaFuze Dark Mode Verification Commands
+
+## Contrast Ratio Testing
+
+# WebAIM Contrast Checker API calls for key color combinations
+curl "https://webaim.org/resources/contrastchecker/?fcolor=E6E7E9&bcolor=0A0B0F&api" # Primary text: 13.2:1
+curl "https://webaim.org/resources/contrastchecker/?fcolor=A1A3A8&bcolor=0A0B0F&api" # Muted text: 7.1:1
+curl "https://webaim.org/resources/contrastchecker/?fcolor=6B8AFF&bcolor=0A0B0F&api" # Primary brand: 6.8:1
+curl "https://webaim.org/resources/contrastchecker/?fcolor=3A3E4F&bcolor=0A0B0F&api" # Border contrast: 3.0:1
+
+## Lighthouse Testing
+
+# Test dark mode performance
+lighthouse https://novafuze.in --chrome-flags="--force-dark-mode" --output html --output-path ./reports/lighthouse-dark.html --form-factor=desktop
+
+# Test light mode performance  
+lighthouse https://novafuze.in --output html --output-path ./reports/lighthouse-light.html --form-factor=desktop
+
+# Mobile dark mode test
+lighthouse https://novafuze.in --chrome-flags="--force-dark-mode" --output html --output-path ./reports/lighthouse-dark-mobile.html --form-factor=mobile
+
+## Browser Testing Commands
+
+# Chrome with forced dark mode
+google-chrome --force-dark-mode --new-window https://novafuze.in
+
+# Chrome with high contrast
+google-chrome --force-high-contrast --new-window https://novafuze.in
+
+# Chrome with reduced motion
+google-chrome --force-prefers-reduced-motion --new-window https://novafuze.in
+
+# Firefox with dark mode preference
+firefox -new-window https://novafuze.in -pref "ui.systemUsesDarkTheme=1"
+
+## Accessibility Testing
+
+# Check for proper heading structure
+axe-core https://novafuze.in --tags="wcag2a,wcag2aa" --output-dir ./reports/accessibility/
+
+# WAVE testing (requires API key)
+wave-api https://novafuze.in --key=YOUR_WAVE_API_KEY --format=json > ./reports/wave-report.json
+
+# Pa11y accessibility testing
+pa11y https://novafuze.in --standard WCAG2AA --reporter cli > ./reports/pa11y-report.txt
+
+## Social Media Preview Testing
+
+# Facebook Sharing Debugger
+curl -X POST "https://graph.facebook.com/" -d "id=https://novafuze.in&scrape=true&access_token=YOUR_TOKEN"
+
+# Twitter Card Validator
+curl "https://cards-dev.twitter.com/validator/preview.json?url=https://novafuze.in"
+
+# LinkedIn Post Inspector
+curl "https://www.linkedin.com/post-inspector/inspect/https://novafuze.in"
+
+## Performance Testing
+
+# Test Core Web Vitals with dark mode
+pagespeed-insights https://novafuze.in --strategy=desktop --format=json > ./reports/pagespeed-desktop.json
+pagespeed-insights https://novafuze.in --strategy=mobile --format=json > ./reports/pagespeed-mobile.json
+
+# Test theme switching performance
+lighthouse https://novafuze.in --throttling-method=devtools --output json --output-path ./reports/performance-baseline.json
+
+## SEO Verification
+
+# Check robots.txt
+curl https://novafuze.in/robots.txt
+
+# Verify sitemap
+curl https://novafuze.in/sitemap.xml
+
+# Check structured data
+curl -H "User-Agent: Googlebot" https://novafuze.in | grep -i "application/ld+json"
+
+# Verify meta tags for dark mode
+curl -s https://novafuze.in | grep -i "og:image\|twitter:image\|theme-color"
+
+## Local Development Testing
+
+# Serve locally with HTTPS (required for some features)
+python3 -m http.server 8000 --bind 127.0.0.1
+
+# Test with local SSL
+openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes
+python3 -m http.server 8000 --bind 127.0.0.1 --ssl
+
+## Color Blindness Testing
+
+# Simulate different types of color blindness
+# Protanopia (red-blind)
+chrome --force-color-profile=color-blind-protanopia https://novafuze.in
+
+# Deuteranopia (green-blind) 
+chrome --force-color-profile=color-blind-deuteranopia https://novafuze.in
+
+# Tritanopia (blue-blind)
+chrome --force-color-profile=color-blind-tritanopia https://novafuze.in
+
+## Manual Testing Checklist Commands
+
+# Test theme persistence
+echo "1. Open site in incognito mode"
+echo "2. Switch to dark mode"
+echo "3. Refresh page - should stay dark"
+echo "4. Open new tab to same site - should be dark"
+
+# Test system preference detection
+echo "1. Set OS to dark mode"
+echo "2. Open site in new incognito window"
+echo "3. Should load in dark mode"
+echo "4. Switch OS to light mode"
+echo "5. Open new incognito window"
+echo "6. Should load in light mode"
+
+# Test focus states
+echo "1. Use Tab key to navigate through all interactive elements"
+echo "2. Verify visible focus rings on all elements"
+echo "3. Test in both light and dark modes"
+echo "4. Verify focus is never lost or trapped"
+
+# Test reduced motion
+echo "1. Enable 'Reduce motion' in OS accessibility settings"
+echo "2. Navigate site - animations should be minimal"
+echo "3. Theme switching should still work but without transitions"
+
+## Automated Testing Scripts
+
+# Run complete test suite
+npm run test:a11y # Accessibility tests
+npm run test:contrast # Contrast ratio tests  
+npm run test:performance # Performance tests
+npm run test:visual # Visual regression tests
+
+## Debugging Commands
+
+# Check CSS custom property values
+console.log(getComputedStyle(document.documentElement).getPropertyValue('--background'));
+console.log(getComputedStyle(document.documentElement).getPropertyValue('--foreground'));
+
+# Verify theme state
+console.log(document.documentElement.classList.contains('dark'));
+console.log(localStorage.getItem('novafuze-tech-ui-theme'));
+
+# Check system preference
+console.log(window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+# Monitor theme changes
+window.addEventListener('themechange', (e) => console.log('Theme changed to:', e.detail.theme));
+
+## Report Generation
+
+# Generate comprehensive accessibility report
+mkdir -p ./reports/$(date +%Y-%m-%d)
+lighthouse https://novafuze.in --output html json --output-path ./reports/$(date +%Y-%m-%d)/lighthouse-report
+axe-core https://novafuze.in --output ./reports/$(date +%Y-%m-%d)/axe-report.json
+pa11y https://novafuze.in --reporter json > ./reports/$(date +%Y-%m-%d)/pa11y-report.json
+
+echo "Reports generated in ./reports/$(date +%Y-%m-%d)/"

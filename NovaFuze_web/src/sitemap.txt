@@ -1,0 +1,138 @@
+novafuze.in — Human-readable sitemap (CMS-ready)
+Primary domain: https://novafuze.in
+Generated: 2025-09-18
+Firebase Project ID: novafuze-tech
+Analytics: G-9P90ME92JY
+
+Notes:
+- This sitemap is CMS-first: each content type should be implemented as an editable collection in your CMS.
+- Pricing must display in INR; Contact & Footer must display a valid Indian domicile address with PIN (set in SiteSettings).
+- Products are external: product entries must include `externalUrl` and redirect behavior (openInNewTab).
+- Team members, services, products, and content will be managed through CMS as specified.
+
+SITE STRUCTURE
+==============
+
+/
+  / (Home)                                — Landing page (CMS Page)
+  /about-us/                              — About overview (CMS Page)
+    /about-us/<team-member-slug>/         — Team member profile (dynamic; CMS: TeamMember)
+  /services/                              — Services listing (CMS Collection: Service)
+    /services/<service-slug>/             — Service detail pages (CMS-managed)
+  /products/                              — Products / Offerings listing (CMS Collection: Product)
+    /products/<product-slug>/             — Product detail (optional CMS page) — CTA: externalUrl -> redirects to product site
+  /blog/                                  — Blog listing (CMS Collection: BlogPost)
+    /blog/<post-slug>/                    — Blog article (Article schema + JSON-LD)
+  /vlogs/                                 — Vlog / Video listing (CMS Collection: Vlog/VideoPost)
+    /vlogs/<vlog-slug>/                   — Vlog detail (VideoObject schema + transcript field)
+  /portfolio/                             — Portfolio / Work listing (CMS Collection: PortfolioProject)
+    /portfolio/<project-slug>/            — Case study / Project detail (link to services used + testimonial)
+  /case-studies/                          — (Optional alias for portfolio or curated case studies)
+  /careers/                               — Careers listing (CMS Collection: JobOpening)
+    /careers/<job-slug>/                  — Job detail (Apply CTA opens Job Application form)
+    /careers/apply/                       — Global apply page or modal endpoint (accepts resume)
+  /contact-us/                            — Contact page (SiteSettings-driven: address, pin, social links, contact form)
+  /search/                                — Search results page (site search)
+  /subscribe/                             — Email capture / landing (newsletter)
+  /faq/                                   — Frequently Asked Questions (CMS Page or Collection)
+  /privacy-policy/                        — Privacy Policy (Policy content type)
+  /terms/                                 — Terms & Conditions (Policy content type)
+  /refund-cancellation-policy/            — Refund & Cancellation Policy (Policy content type)
+  /pricing/                               — Pricing overview (can be a CMS Page referencing Product prices in INR)
+  /sitemap.xml                            — Machine-generated sitemap (serverless endpoint or build-time file)
+  /robots.txt                             — Robots rules
+  /404                                    — Custom 404 page
+  /admin/*                                — Admin UI (separate app or protected admin routes; not public indexed pages)
+  /assets/...                             — Public media assets (images, thumbnails, poster images)
+  /media/uploads/...                      — (Private) media: resumes, originals (protected via signed URLs)
+  /api/...                                — Serverless endpoints (sitemap generation, contact submit, job-apply submit, set-claims admin function)
+
+CMS COLLECTIONS / CONTENT TYPES (required)
+==========================================
+  - Page (generic CMS page; slug, title, content_blocks, seo)
+  - TeamMember (name, slug, role, shortBio, photo, socialLinks[LinkedIn,GitHub,Twitter,Website], order, featured)
+  - Service (title, slug, summary, richContent, images, relatedPortfolioRefs, isActive)
+  - Product (title, slug, shortDescription, image, externalUrl, priceINR, currency='INR', openInNewTab)
+  - BlogPost (title, slug, excerpt, body, authorRef, categories, tags, featuredImage, publishDate, seo)
+  - Vlog/VideoPost (title, slug, description, videoSource [mux/youtube/storage], poster, transcript, duration, publishDate, seo)
+  - PortfolioProject (title, slug, clientName, clientWebsite, projectDate, summary, description, images, servicesUsedRefs, testimonialRef, status, featured)
+  - Testimonial (clientName, company, quote, projectRef, photo, approved)
+  - JobOpening (title, slug, location, employmentType, description, responsibilities, requirements, acceptResume)
+  - JobApplication (jobRef, applicantName, email, phone, resumeFileRef, coverLetter, appliedAt, status) — admin-only read access
+  - Policy (title, slug, content, effectiveDate)
+  - SiteSettings (siteTitle, logo, address, pinCode, phone, email, socialLinks[], footerLinks[], analyticsIDs)
+
+SEO & SCHEMA NOTES
+==================
+  - Every Page/Article/Vlog must have: metaTitle, metaDescription, canonicalUrl, og:image, json-ld where applicable.
+  - Blog/Vlog: include Article or VideoObject schema; include transcript for video SEO.
+  - Implement sitemap.xml endpoint that lists all public content and lastmod dates.
+  - Implement robots.txt and register site with Google Search Console + Bing Webmaster.
+
+MIGRATION PLANNING
+==================
+Since existing content export will be provided later, here's the recommended approach:
+
+Current Site Analysis (To Be Completed):
+  - Export current https://novafuze.in sitemap.xml or provide URL list
+  - Identify high-value pages for SEO preservation
+  - Create 301 redirect map: old_url -> new_url
+
+Expected Migration Categories:
+  - Static pages: About, Contact, Services → migrate to CMS Pages
+  - Blog posts → migrate to BlogPost collection 
+  - Team pages → migrate to TeamMember collection
+  - Service pages → migrate to Service collection
+  - Product pages → migrate to Product collection (with external redirects)
+
+Redirect Strategy (Examples):
+  https://novafuze.in/old-service-page/ → /services/new-service-slug/
+  https://novafuze.in/old-blog-post/ → /blog/migrated-post-slug/
+  https://novafuze.in/team/old-member/ → /about-us/member-slug/
+
+Third-party Integrations & Config Points
+=========================================
+Set in SiteSettings CMS:
+  - Google Analytics GA4 ID: G-9P90ME92JY (from Firebase config)
+  - Google Search Console verification token
+  - CDN / image optimization service (Cloudflare Images / Imgix / Firebase + Cloudflare)
+  - Video platform: Mux | Cloudflare Stream | YouTube as fallback
+  - Email provider: SendGrid / Mailgun
+  - Optional: Algolia for site search, Pinecone for future vector search / AI bot
+
+ASSUMPTIONS MADE
+================
+1. Company legal name: "NovaFuze" (please confirm)
+2. Contact address: Placeholder needed - please provide full Indian address with PIN code for:
+   - Contact page display
+   - Footer legal compliance
+   - Business registration requirements
+3. Content migration: Existing content structure will be analyzed when content export is provided
+4. CMS choice: Recommending Sanity for ease of use, but can adapt to Strapi/Contentful/Firebase-only
+
+NEXT STEPS FOR CONTENT POPULATION
+=================================
+1. Provide actual contact address with PIN code for legal compliance
+2. Confirm company legal name for Terms/Privacy policies
+3. Export current site content for migration planning
+4. Define initial team members, services, and products for CMS seeding
+5. Review and approve this sitemap structure
+
+TECHNICAL IMPLEMENTATION NOTES
+==============================
+- Use Next.js with ISR for blog & portfolio (revalidate on content webhook)
+- Protect JobApplication collection and resumes; use signed URLs for admin downloads
+- Admin login: add login UI in hamburger menu and use Firebase Auth + custom claims admin:true
+- Firebase project: novafuze-tech (provided)
+- Logo asset: Available via figma:asset/acee916766ea85ac3878da8c0c45f93233290054.png
+
+DELIVERY CONFIRMATION
+=====================
+This is deliverable #1 of 10 in the OutputFilesSequence. 
+
+✅ Generated: sitemap.txt
+⏳ Next: cms_schema.json (upon approval)
+
+Please review this sitemap and respond with:
+- "approve cms_schema" to generate the next deliverable, OR
+- List any changes needed to the sitemap structure before proceeding

@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+
+# Block admin and private areas
+Disallow: /admin/
+Disallow: /cms/
+Disallow: /_next/
+Disallow: /api/
+
+# Important files
+Sitemap: https://novafuze.in/sitemap.xml
+
+# Crawl-delay for courtesy
+Crawl-delay: 1

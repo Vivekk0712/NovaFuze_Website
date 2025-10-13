@@ -1,0 +1,62 @@
+import React, { useState } from 'react';
+import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { auth } from '../../firebaseClient';
+import { sessionLogin } from '../../services/authApi';
+import { Button, Alert } from 'react-bootstrap';
+import { motion } from 'framer-motion';
+
+const GoogleSignIn = () => {
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSignIn = async () => {
+    setError(null);
+    try {
+      if (!auth) {
+        setError('Authentication is not configured. Please set Firebase env vars.');
+        return;
+      }
+      const provider = new GoogleAuthProvider();
+      const userCredential = await signInWithPopup(auth, provider);
+      const idToken = await userCredential.user.getIdToken();
+      await sessionLogin(idToken);
+      window.location.reload(); // Reload to fetch user session
+    } catch (error: any) {
+      setError(error.message);
+    }
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="d-grid"
+    >
+      <Button
+        as={motion.button}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        className="btn-google-custom"
+        style={{
+          background: 'linear-gradient(90deg, #6366f1, #8b5cf6)',
+          color: '#ffffff',
+          border: 'none',
+          borderRadius: 12,
+          padding: '10px 14px',
+          boxShadow: '0 10px 24px rgba(99,102,241,0.35)',
+          transition: 'filter 160ms ease',
+          filter: 'saturate(1.05)'
+        }}
+        onClick={handleSignIn}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-google me-2" viewBox="0 0 16 16">
+          <path d="M15.545 6.558a9.42 9.42 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0a7.689 7.689 0 0 1 5.352 2.082l-2.284 2.284A4.347 4.347 0 0 0 8 3.166c-2.087 0-3.86 1.408-4.492 3.304a4.792 4.792 0 0 0 0 3.063h.003c.635 1.893 2.405 3.301 4.492 3.301 1.078 0 2.004-.276 2.722-.764h-.003a3.702 3.702 0 0 0 1.599-2.431H8v-3.08h7.545z"/>
+        </svg>
+        Sign In with Google
+      </Button>
+      {error && <Alert variant="danger" className="mt-3">{error}</Alert>}
+    </motion.div>
+  );
+};
+
+export default GoogleSignIn;

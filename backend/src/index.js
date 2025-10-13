@@ -11,11 +11,16 @@ const corsOptions = {
   origin: [
     'https://fire-auth-mcp.netlify.app', // Production frontend
     'http://localhost:5173',             // Local testing
+    'http://localhost:5174',             // NovaFuze local testing
+    'http://localhost:3000',             // Vite v6 default port
   ],
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 };
 
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 

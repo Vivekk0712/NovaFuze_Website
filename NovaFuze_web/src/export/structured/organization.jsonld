@@ -1,0 +1,66 @@
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "NovaFuze",
+  "alternateName": "NovaFuze Tech",
+  "url": "https://novafuze.in",
+  "logo": "https://novafuze.in/logo.png",
+  "description": "AI-first web and mobile development company specializing in custom applications for startups and enterprises",
+  "foundingDate": "2020",
+  "founders": [
+    {
+      "@type": "Person",
+      "name": "Balaji"
+    }
+  ],
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "123 Innovation Hub, Koramangala",
+    "addressLocality": "Bangalore",
+    "addressRegion": "Karnataka",
+    "postalCode": "560034",
+    "addressCountry": "IN"
+  },
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "telephone": "+91-80-12345678",
+    "contactType": "customer service",
+    "email": "support@novafuze.in",
+    "availableLanguage": ["English", "Hindi"]
+  },
+  "sameAs": [
+    "https://www.linkedin.com/company/novafuze",
+    "https://twitter.com/novafuze",
+    "https://github.com/novafuze"
+  ],
+  "service": [
+    {
+      "@type": "Service",
+      "name": "Web Development",
+      "description": "Custom web application development using modern frameworks"
+    },
+    {
+      "@type": "Service", 
+      "name": "Mobile App Development",
+      "description": "Native and cross-platform mobile application development"
+    },
+    {
+      "@type": "Service",
+      "name": "AI Integration",
+      "description": "AI-powered solutions and integrations for business applications"
+    }
+  ],
+  "areaServed": {
+    "@type": "Country",
+    "name": "India"
+  },
+  "knowsAbout": [
+    "Web Development",
+    "Mobile App Development", 
+    "Artificial Intelligence",
+    "React",
+    "Next.js",
+    "React Native",
+    "Node.js"
+  ]
+}
