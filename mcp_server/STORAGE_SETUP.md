@@ -48,3 +48,27 @@ Modify `setup_storage.py` to:
 - Add more buckets
 - Change file size limits
 - Adjust allowed MIME types
+
+## Supported File Types
+
+The storage bucket is configured to support the following file types:
+
+### Document Types
+- PDF (`.pdf`)
+- Microsoft Word (`.docx`, `.doc`)
+- Microsoft Excel (`.xlsx`, `.xls`)
+- Plain Text (`.txt`)
+
+### Web & Markup Files
+- HTML (`.html`)
+- JSON (`.json`)
+- CSV (`.csv`)
+- XML (`.xml`)
+
+### File Size Limit
+- Maximum file size: 50 MB per file
+
+### Storage Configuration
+- Private access
+- MIME type validation
+- Unique filename generation

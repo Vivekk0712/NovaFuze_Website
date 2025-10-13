@@ -38,15 +38,40 @@ def create_storage_bucket(supabase: Client, bucket_name: str = 'files'):
                 print(f"Bucket '{bucket_name}' already exists.")
                 return
         
+        # Allowed MIME types for various document types
+        allowed_mime_types = [
+            # PDF
+            'application/pdf',
+            
+            # Text files
+            'text/plain',
+            
+            # Microsoft Office/OpenOffice
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',  # .docx
+            'application/msword',  # .doc
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',  # .xlsx
+            'application/vnd.ms-excel',  # .xls
+            
+            # Web/Markup files
+            'text/html',
+            'application/json',
+            'text/csv',
+            'application/xml',
+            'text/xml'
+        ]
+        
         # Create bucket
         response = supabase.storage.create_bucket(
             bucket_name, 
             public=False,  # Private by default
             file_size_limit=50 * 1024 * 1024,  # 50MB limit
-            allowed_mime_types=['application/pdf']  # Restrict to PDFs
+            allowed_mime_types=allowed_mime_types
         )
         
         print(f"Successfully created bucket: {bucket_name}")
+        print("Supported file types:")
+        for mime_type in allowed_mime_types:
+            print(f"- {mime_type}")
         
     except Exception as e:
         print(f"Error creating bucket '{bucket_name}': {e}")

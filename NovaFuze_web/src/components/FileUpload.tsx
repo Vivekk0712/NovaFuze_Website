@@ -25,6 +25,26 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
   const [showFiles, setShowFiles] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Supported file types
+  const SUPPORTED_FILE_TYPES = [
+    'application/pdf',
+    'application/msword', 
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+    'application/vnd.ms-excel', 
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+    'text/plain',
+    'text/html',
+    'application/json',
+    'text/csv',
+    'application/xml',
+    'text/xml'
+  ];
+
+  const SUPPORTED_EXTENSIONS = [
+    '.pdf', '.doc', '.docx', '.xls', '.xlsx', 
+    '.txt', '.html', '.json', '.csv', '.xml'
+  ];
+
   // Load user files on component mount
   React.useEffect(() => {
     loadUserFiles();
@@ -43,13 +63,17 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
     if (!files || files.length === 0) return;
 
     const file = files[0];
-    if (!file.type.includes('pdf')) {
-      toast.error('Please select a PDF file');
+    
+    // Check file type
+    if (!SUPPORTED_FILE_TYPES.includes(file.type)) {
+      toast.error('Unsupported file type', {
+        description: `Supported types: ${SUPPORTED_EXTENSIONS.join(', ')}`
+      });
       return;
     }
 
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error('File size must be less than 10MB');
+    if (file.size > 50 * 1024 * 1024) {  // 50MB limit
+      toast.error('File size must be less than 50MB');
       return;
     }
 
@@ -78,7 +102,15 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
       }
     } catch (error: any) {
       console.error('Upload error:', error);
-      toast.error(error.response?.data?.error?.message || 'Upload failed');
+      
+      // Handle specific error types
+      if (error.response?.data?.error?.code === 'UNSUPPORTED_FILE_TYPE') {
+        toast.error('Unsupported File Type', {
+          description: error.response.data.error.message
+        });
+      } else {
+        toast.error(error.response?.data?.error?.message || 'Upload failed');
+      }
     } finally {
       setIsUploading(false);
     }
@@ -144,7 +176,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Upload className="h-5 w-5" />
-            Upload PDF Documents
+            Upload Documents
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -167,10 +199,10 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
           >
             <Upload className="h-12 w-12 mx-auto mb-4 text-gray-400" />
             <p className="text-lg font-medium mb-2">
-              {isUploading ? 'Uploading...' : 'Drop your PDF here'}
+              {isUploading ? 'Uploading...' : 'Drop your files here'}
             </p>
             <p className="text-sm text-gray-500 mb-4">
-              or click to browse files (max 10MB)
+              or click to browse files (max 50MB)
             </p>
             <Button
               onClick={() => fileInputRef.current?.click()}
@@ -182,12 +214,12 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUploaded }) => {
             <input
               ref={fileInputRef}
               type="file"
-              accept=".pdf"
+              accept={SUPPORTED_EXTENSIONS.join(',')}
               onChange={(e) => handleFileSelect(e.target.files)}
               className="hidden"
             />
             <p className="text-xs text-gray-400">
-              Supported format: PDF only
+              Supported formats: {SUPPORTED_EXTENSIONS.join(', ')}
             </p>
           </div>
         </CardContent>

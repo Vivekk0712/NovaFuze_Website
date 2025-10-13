@@ -11,13 +11,31 @@ const router = express.Router();
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB limit
+    fileSize: 50 * 1024 * 1024, // 50MB limit
   },
   fileFilter: (req, file, cb) => {
-    if (file.mimetype === 'application/pdf') {
+    // Supported MIME types
+    const SUPPORTED_MIME_TYPES = [
+      // Document types
+      'application/pdf',
+      'application/msword', 
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+      'application/vnd.ms-excel', 
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+      'text/plain',
+      
+      // Web/Markup files
+      'text/html',
+      'application/json',
+      'text/csv',
+      'application/xml',
+      'text/xml'
+    ];
+
+    if (SUPPORTED_MIME_TYPES.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Only PDF files are allowed'), false);
+      cb(new Error(`Unsupported file type: ${file.mimetype}. Supported types: ${SUPPORTED_MIME_TYPES.join(', ')}`), false);
     }
   }
 });
@@ -179,8 +197,25 @@ router.post('/upload-pdf', verifySession, upload.single('file'), async (req, res
     );
     res.json(mcpResponse.data);
   } catch (error) {
-    console.error('Error uploading PDF to MCP server:', error);
-    res.status(500).json({ error: { code: 'MCP_SERVER_ERROR', message: 'Error uploading PDF to MCP server' } });
+    console.error('Error uploading file to MCP server:', error);
+    
+    // Check if it's a Multer file filter error
+    if (error.message.includes('Unsupported file type')) {
+      return res.status(400).json({ 
+        error: { 
+          code: 'UNSUPPORTED_FILE_TYPE', 
+          message: error.message 
+        } 
+      });
+    }
+
+    // Generic server error
+    res.status(500).json({ 
+      error: { 
+        code: 'MCP_SERVER_ERROR', 
+        message: 'Error uploading file to MCP server' 
+      } 
+    });
   }
 });
 

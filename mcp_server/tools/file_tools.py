@@ -52,122 +52,162 @@ def generate_embedding(text: str) -> List[float]:
         print(f"Error generating embedding: {e}")
         return [0.0] * 1536
 
-def extract_text_from_pdf(file_content: bytes) -> Dict[str, Any]:
-    """Extract text content from PDF file"""
+def extract_text_from_file(file_content: bytes, filename: str) -> Dict[str, Any]:
+    """
+    Extract text from various file types
+    """
+    import os
+    import mimetypes
+
+    # Detect MIME type from filename
+    mime_type, _ = mimetypes.guess_type(filename)
+    if not mime_type:
+        mime_type = 'application/octet-stream'
+
     try:
-        pdf_file = io.BytesIO(file_content)
-        pdf_reader = PyPDF2.PdfReader(pdf_file)
-        
-        extracted_data = {
-            'total_pages': len(pdf_reader.pages),
-            'chunks': [],
-            'full_text': ''
-        }
-        
-        full_text = ""
-        chunk_size = 1000  # characters per chunk
-        chunk_overlap = 200  # overlap between chunks
-        
-        for page_num, page in enumerate(pdf_reader.pages):
-            try:
-                page_text = page.extract_text()
-                full_text += f"\n--- Page {page_num + 1} ---\n{page_text}"
-                
-                # Split page text into chunks
-                if len(page_text) > chunk_size:
-                    start = 0
-                    chunk_index = 0
-                    while start < len(page_text):
-                        end = start + chunk_size
-                        chunk_text = page_text[start:end]
-                        
-                        # Try to break at word boundary
-                        if end < len(page_text):
-                            last_space = chunk_text.rfind(' ')
-                            if last_space > chunk_size * 0.7:  # Don't break too early
-                                end = start + last_space
-                                chunk_text = page_text[start:end]
-                        
-                        extracted_data['chunks'].append({
-                            'chunk_index': chunk_index,
-                            'content': chunk_text.strip(),
-                            'page_number': page_num + 1
-                        })
-                        
-                        start = end - chunk_overlap
-                        chunk_index += 1
-                else:
-                    # Page fits in one chunk
-                    extracted_data['chunks'].append({
-                        'chunk_index': 0,
-                        'content': page_text.strip(),
-                        'page_number': page_num + 1
-                    })
-                    
-            except Exception as e:
-                print(f"Error extracting text from page {page_num + 1}: {e}")
-                continue
-        
-        extracted_data['full_text'] = full_text.strip()
-        return extracted_data
-        
+        if mime_type == 'application/pdf':
+            from PyPDF2 import PdfReader
+            import io
+            pdf_reader = PdfReader(io.BytesIO(file_content))
+            text_content = "\n".join([page.extract_text() or "" for page in pdf_reader.pages])
+            return {
+                'text': text_content,
+                'mime_type': mime_type,
+                'chunks': _chunk_text(text_content),
+                'page_count': len(pdf_reader.pages)
+            }
+        elif mime_type == 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' or filename.lower().endswith('.docx'):
+            from docx import Document
+            import io
+            doc = Document(io.BytesIO(file_content))
+            text_content = "\n".join([para.text for para in doc.paragraphs if para.text])
+            return {
+                'text': text_content,
+                'mime_type': mime_type,
+                'chunks': _chunk_text(text_content),
+                'paragraph_count': len(doc.paragraphs)
+            }
+        elif mime_type == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' or filename.lower().endswith('.xlsx'):
+            import openpyxl
+            import io
+            workbook = openpyxl.load_workbook(io.BytesIO(file_content), read_only=True)
+            text_content = []
+            for sheet in workbook:
+                for row in sheet.iter_rows(values_only=True):
+                    row_text = " ".join(str(cell) for cell in row if cell is not None)
+                    if row_text:
+                        text_content.append(row_text)
+            text_content = "\n".join(text_content)
+            return {
+                'text': text_content,
+                'mime_type': mime_type,
+                'chunks': _chunk_text(text_content),
+                'sheet_count': len(workbook.sheetnames)
+            }
+        elif mime_type in ['text/plain', 'text/html', 'application/json', 'text/csv', 'application/xml', 'text/xml'] or any(filename.lower().endswith(ext) for ext in ['.txt','.html','.json','.csv','.xml']):
+            text_content = file_content.decode('utf-8', errors='ignore')
+            if mime_type == 'text/html' or filename.lower().endswith('.html'):
+                from bs4 import BeautifulSoup
+                soup = BeautifulSoup(text_content, 'lxml')
+                text_content = soup.get_text()
+            return {
+                'text': text_content,
+                'mime_type': mime_type,
+                'chunks': _chunk_text(text_content)
+            }
+        else:
+            raise ValueError(f"Unsupported file type: {mime_type}")
     except Exception as e:
-        raise Exception(f"Failed to extract text from PDF: {str(e)}")
+        raise Exception(f"Error extracting text from {filename}: {str(e)}")
+
+def _chunk_text(text: str, chunk_size: int = 1000, overlap: int = 200, default_page: int = 1) -> List[Dict[str, Any]]:
+    """
+    Split text into overlapping chunks and return structured chunk dicts.
+    """
+    chunks: List[Dict[str, Any]] = []
+    start = 0
+    chunk_index = 0
+    text = text or ""
+    while start < len(text):
+        end = start + chunk_size
+        chunk_content = text[start:end]
+        chunks.append({
+            'chunk_index': chunk_index,
+            'content': chunk_content,
+            'page_number': default_page
+        })
+        start = max(end - overlap, end) if overlap > 0 else end
+        chunk_index += 1
+    # Handle empty text - still create a single empty chunk
+    if not chunks:
+        chunks.append({
+            'chunk_index': 0,
+            'content': '',
+            'page_number': default_page
+        })
+    return chunks
 
 def upload_file_to_storage(file_content: bytes, filename: str, user_id: str) -> str:
-    """Upload file to Supabase Storage"""
+    """Upload file to Supabase Storage with MIME type detection"""
     try:
-        from supabase_client import supabase
-        
+        from supabase_client import supabase # Local import
         if supabase is None:
             raise Exception("Supabase client not initialized")
-        
-        # Create unique filename
+        import mimetypes
+        mime_type, _ = mimetypes.guess_type(filename)
+        if not mime_type:
+            mime_type = 'application/octet-stream'
+        allowed_mime_types = [
+            'application/pdf',
+            'text/plain',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'application/msword',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'application/vnd.ms-excel',
+            'text/html',
+            'application/json',
+            'text/csv',
+            'application/xml',
+            'text/xml'
+        ]
+        if mime_type not in allowed_mime_types:
+            raise ValueError(f"Unsupported file type: {mime_type}")
         file_extension = os.path.splitext(filename)[1]
         unique_filename = f"{uuid.uuid4()}{file_extension}"
         storage_path = f"uploads/{user_id}/{unique_filename}"
-        
-        # Upload to Supabase Storage
         response = supabase.storage.from_("files").upload(
             path=storage_path,
             file=file_content,
-            file_options={"content-type": "application/pdf"}
+            file_options={"content-type": mime_type}
         )
-        
-        # Check if upload was successful (Response object)
         if hasattr(response, 'status_code') and response.status_code != 200:
             raise Exception(f"Storage upload failed with status {response.status_code}")
-        
         return storage_path
-        
     except Exception as e:
         raise Exception(f"Failed to upload file to storage: {str(e)}")
 
-def create_file_record(user_id: str, filename: str, file_size: int, file_path: str) -> Dict[str, Any]:
+def create_file_record(user_id: str, filename: str, file_size: int, file_path: str, content_type: str) -> Dict[str, Any]:
     """Create file record in database"""
     try:
         from supabase_client import supabase
-        
         if supabase is None:
             raise Exception("Supabase client not initialized")
-        
+        file_extension = os.path.splitext(filename)[1].lstrip('.').lower() or 'bin'
         file_data = {
             'user_id': user_id,
             'filename': os.path.basename(file_path),
             'original_filename': filename,
-            'file_type': 'pdf',
+            'file_type': file_extension,
             'file_size': file_size,
             'file_path': file_path,
-            'content_type': 'application/pdf',
+            'content_type': content_type,
             'upload_status': 'uploaded'
         }
-        
         response = supabase.table('files').insert(file_data).execute()
         if response.data:
             return response.data[0]
         else:
             raise Exception("Failed to create file record")
-            
     except Exception as e:
         raise Exception(f"Failed to create file record: {str(e)}")
 
@@ -175,98 +215,75 @@ def process_file_chunks(file_id: str, chunks: List[Dict[str, Any]]) -> List[Dict
     """Process and store file chunks with embeddings"""
     try:
         from supabase_client import supabase
-        
         if supabase is None:
             raise Exception("Supabase client not initialized")
-        
-        chunk_records = []
-        
+        chunk_records: List[Dict[str, Any]] = []
         for chunk in chunks:
-            # Create chunk record
+            # Ensure chunk is a dict
+            if isinstance(chunk, str):
+                chunk = {
+                    'chunk_index': len(chunk_records),
+                    'content': chunk,
+                    'page_number': None
+                }
             chunk_data = {
                 'file_id': file_id,
-                'chunk_index': chunk['chunk_index'],
-                'content': chunk['content'],
-                'page_number': chunk['page_number']
+                'chunk_index': chunk.get('chunk_index', len(chunk_records)),
+                'content': chunk.get('content', ''),
+                'page_number': chunk.get('page_number')
             }
-            
             chunk_response = supabase.table('file_chunks').insert(chunk_data).execute()
             if not chunk_response.data:
                 continue
-                
             chunk_record = chunk_response.data[0]
             chunk_records.append(chunk_record)
-            
-            # Generate and store embedding
-            embedding = generate_embedding(chunk['content'])
+            embedding = generate_embedding(chunk_data['content'])
             embedding_data = {
                 'file_chunk_id': chunk_record['id'],
                 'vector': embedding,
                 'content_type': 'file_chunk'
             }
-            
             supabase.table('embeddings').insert(embedding_data).execute()
-        
         return chunk_records
-        
     except Exception as e:
         raise Exception(f"Failed to process file chunks: {str(e)}")
 
 def upload_pdf_file(user_id: str, filename: str, file_content: bytes) -> Dict[str, Any]:
-    """Complete PDF upload process"""
+    """Complete file upload process (supports multiple types)"""
     try:
         from supabase_client import supabase, get_or_create_user
-        
         if supabase is None:
             raise Exception("Supabase client not initialized")
-        
-        # Get or create user and get their UUID
         user_record = get_or_create_user(user_id)
         user_uuid = user_record['id']
-        
-        # Extract text from PDF
-        extracted_data = extract_text_from_pdf(file_content)
-        
-        # Upload file to storage
+        extracted_data = extract_text_from_file(file_content, filename)
+        content_type = extracted_data.get('mime_type', 'application/octet-stream')
         file_path = upload_file_to_storage(file_content, filename, user_uuid)
-        
-        # Create file record using user UUID
-        file_record = create_file_record(user_uuid, filename, len(file_content), file_path)
-        
-        # Update status to processing
+        file_record = create_file_record(user_uuid, filename, len(file_content), file_path, content_type)
         supabase.table('files').update({
             'upload_status': 'processing'
         }).eq('id', file_record['id']).execute()
-        
         try:
-            # Process chunks and generate embeddings
             chunk_records = process_file_chunks(file_record['id'], extracted_data['chunks'])
-            
-            # Update status to processed
             supabase.table('files').update({
                 'upload_status': 'processed',
                 'updated_at': datetime.now().isoformat()
             }).eq('id', file_record['id']).execute()
-            
             return {
                 'success': True,
                 'file_id': file_record['id'],
                 'filename': filename,
-                'total_pages': extracted_data['total_pages'],
+                'total_pages': extracted_data.get('page_count'),
                 'chunks_created': len(chunk_records),
                 'file_path': file_path
             }
-            
         except Exception as processing_error:
-            # Update status to failed
             supabase.table('files').update({
                 'upload_status': 'failed',
                 'processing_error': str(processing_error),
                 'updated_at': datetime.now().isoformat()
             }).eq('id', file_record['id']).execute()
-            
             raise processing_error
-            
     except Exception as e:
         return {
             'success': False,

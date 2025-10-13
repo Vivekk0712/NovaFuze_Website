@@ -87,7 +87,7 @@ async def mcp_query(request: ChatRequest):
 
         # 3. Search for relevant file content
         logger.info("Searching for relevant file content...")
-        file_context = file_tools.search_similar_chunks(user_message, user_id, limit=3)
+        file_context = file_tools.search_similar_chunks(user_message, user_id, limit=50)
         logger.info(f"Found {len(file_context)} relevant file chunks")
 
         # 4. Generate response with user context and file context
@@ -135,27 +135,59 @@ async def mcp_clear_chat(user_id: str):
 # File Upload Endpoints
 @app.post("/mcp/upload-pdf")
 async def upload_pdf(user_id: str, file: UploadFile = File(...)):
-    logger.info(f"Uploading PDF file for user {user_id}")
+    logger.info(f"Uploading file for user {user_id}")
     
-    # Validate file type
-    if not file.filename.lower().endswith('.pdf'):
-        raise HTTPException(status_code=400, detail="Only PDF files are allowed")
+    # Supported MIME types
+    SUPPORTED_MIME_TYPES = [
+        # Document types
+        'application/pdf',
+        'application/msword', 
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document', # .docx
+        'application/vnd.ms-excel', 
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', # .xlsx
+        'text/plain',
+        
+        # Web/Markup files
+        'text/html',
+        'application/json',
+        'text/csv',
+        'application/xml',
+        'text/xml'
+    ]
     
-    # Check file size (max 10MB)
+    # Read file content
     file_content = await file.read()
-    if len(file_content) > 10 * 1024 * 1024:
-        raise HTTPException(status_code=400, detail="File size too large. Maximum 10MB allowed")
+    
+    # Detect MIME type using filename (works cross-platform)
+    import mimetypes
+    mime_type, _ = mimetypes.guess_type(file.filename)
+    if not mime_type:
+        # Fallback to generic binary if unknown; downstream validator will reject if not supported
+        mime_type = 'application/octet-stream'
+    
+    # Validate MIME type
+    if mime_type not in SUPPORTED_MIME_TYPES:
+        raise HTTPException(status_code=400, detail=f"Unsupported file type: {mime_type}")
+    
+    # Check file size (max 50MB)
+    if len(file_content) > 50 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="File size too large. Maximum 50MB allowed")
     
     try:
-        result = file_tools.upload_pdf_file(user_id, file.filename, file_content)
-        if result['success']:
-            logger.info(f"Successfully uploaded PDF for user {user_id}")
-            return result
-        else:
-            raise HTTPException(status_code=500, detail=result['error'])
+        # Import file tools
+        from tools.file_tools import upload_pdf_file
+        
+        # Upload file
+        result = upload_pdf_file(
+            user_id=user_id, 
+            filename=file.filename, 
+            file_content=file_content
+        )
+        
+        return result
     except Exception as e:
-        logger.error(f"Error uploading PDF for user {user_id}: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error")
+        logger.error(f"Error uploading file for user {user_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/mcp/files")
 async def get_user_files(user_id: str):
