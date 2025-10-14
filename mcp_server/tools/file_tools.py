@@ -325,55 +325,60 @@ def get_file_by_id(file_id: str) -> Optional[Dict[str, Any]]:
         return None
 
 def search_similar_chunks(query: str, user_id: str, limit: int = 5) -> List[Dict[str, Any]]:
-    """Search for similar file chunks using text similarity"""
+    """Search for similar file chunks using pgvector similarity if available, else fallback."""
     try:
         from supabase_client import supabase, get_or_create_user
-        
         if supabase is None:
             print("Supabase client not initialized")
             return []
-        
-        # Get or create user and get their UUID
+        # Map Firebase UID to UUID
         user_record = get_or_create_user(user_id)
         user_uuid = user_record['id']
-        
-        # Get user's files
+        # Generate query embedding (1536-dim) using the same embedding generator
+        query_vector = generate_embedding(query)
+        # Call RPC for vector similarity
+        try:
+            rpc_resp = supabase.rpc('match_file_chunks', {
+                'query_embedding': query_vector,
+                'match_count': limit,
+                'user_uuid': user_uuid
+            }).execute()
+            if rpc_resp.data:
+                # Normalize shape to match previous output used by the caller
+                return [
+                    {
+                        'id': row['id'],
+                        'content': row['content'],
+                        'page_number': row.get('page_number'),
+                        'file_id': row['file_id'],
+                        'similarity_score': row.get('similarity', 0)
+                    }
+                    for row in rpc_resp.data
+                ]
+        except Exception as e:
+            print(f"Vector RPC failed, falling back to text overlap: {e}")
+        # Fallback: simple text overlap across user's files
         user_files = get_user_files(user_id)
         if not user_files:
             return []
-        
         file_ids = [f['id'] for f in user_files]
-        
-        # Use simple text search
         response = supabase.table('file_chunks').select(
             'id, content, page_number, file_id, files!inner(filename, original_filename)'
         ).in_('file_id', file_ids).execute()
-        
         if not response.data:
             return []
-        
-        # Simple similarity scoring based on text overlap
         chunks_with_scores = []
         query_lower = query.lower()
-        
+        query_words = set(query_lower.split())
         for chunk in response.data:
-            content_lower = chunk['content'].lower()
-            # Simple scoring based on word overlap
-            query_words = set(query_lower.split())
+            content_lower = (chunk['content'] or '').lower()
             content_words = set(content_lower.split())
             overlap = len(query_words.intersection(content_words))
             score = overlap / len(query_words) if query_words else 0
-            
             if score > 0:
-                chunks_with_scores.append({
-                    **chunk,
-                    'similarity_score': score
-                })
-        
-        # Sort by similarity score and return top results
+                chunks_with_scores.append({ **chunk, 'similarity_score': score })
         chunks_with_scores.sort(key=lambda x: x['similarity_score'], reverse=True)
         return chunks_with_scores[:limit]
-        
     except Exception as e:
         print(f"Error searching similar chunks: {e}")
         return []

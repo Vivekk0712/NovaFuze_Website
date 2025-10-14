@@ -103,3 +103,36 @@ create trigger update_files_updated_at
   before update on files
   for each row
   execute function update_updated_at_column();
+
+-- Match file chunks by vector similarity for a given user
+create or replace function public.match_file_chunks(
+  query_embedding vector(1536),
+  match_count int,
+  user_uuid uuid
+)
+returns table (
+  id uuid,
+  content text,
+  page_number int,
+  file_id uuid,
+  similarity float
+)
+language sql
+stable
+as $$
+  select fc.id,
+         fc.content,
+         fc.page_number,
+         fc.file_id,
+         1 - (e.vector <=> query_embedding) as similarity
+  from public.embeddings e
+  join public.file_chunks fc on fc.id = e.file_chunk_id
+  join public.files f on f.id = fc.file_id
+  where e.content_type = 'file_chunk'
+    and f.user_id = user_uuid
+  order by e.vector <=> query_embedding
+  limit match_count;
+$$;
+
+-- Ensure function is available via PostgREST
+comment on function public.match_file_chunks(vector(1536), int, uuid) is 'RPC for vector similarity over file_chunks for a specific user';
