@@ -10,6 +10,7 @@ from pydantic_settings import BaseSettings
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '.')))
 
 from tools import user_tools, chat_tools, file_tools, admin_tools
+from tools import site_tools
 from ai_client import generate_from_prompt
 from supabase_client import init_supabase
 
@@ -35,6 +36,14 @@ security = HTTPBearer()
 @app.on_event("startup")
 async def startup_event():
     init_supabase(settings.SUPABASE_URL, settings.SUPABASE_SERVICE_ROLE_KEY)
+    # Load UI awareness from frontend
+    try:
+        site_tools.load_site_facts()
+        site_tools.load_structural_awareness()
+        site_tools.load_functional_awareness()
+        logger.info("UI awareness loaded successfully")
+    except Exception as e:
+        logger.warning(f"Could not load UI awareness: {e}")
 
 class ChatRequest(BaseModel):
     user_id: str
@@ -90,9 +99,16 @@ async def mcp_query(request: ChatRequest):
         file_context = file_tools.search_similar_chunks(user_message, user_id, limit=50)
         logger.info(f"Found {len(file_context)} relevant file chunks")
 
-        # 4. Generate response with user context and file context
+        # 3.5 Add UI awareness as context (structural + functional + contact)
+        ui_context = site_tools.get_ui_context()
+        site_context = []
+        if ui_context:
+            site_context = [{ 'content': ui_context }]
+
+        # 4. Generate response with user context, file context, and site facts
         logger.info("Generating AI response...")
-        assistant_response = generate_from_prompt(user_message, chat_history, user_name, file_context)
+        merged_context = (file_context or []) + site_context
+        assistant_response = generate_from_prompt(user_message, chat_history, user_name, merged_context)
         logger.info(f"Assistant response generated successfully")
 
         # 5. Store messages
