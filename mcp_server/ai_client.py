@@ -1,4 +1,5 @@
 import os
+import re
 import google.generativeai as genai
 
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
@@ -9,52 +10,72 @@ def generate_from_prompt(prompt: str, context: list[dict], user_name: str = None
     """
     Generates a response from the Gemini model with optional file context.
     """
-    # System prompt to define AI behavior
-    system_prompt = """You are a helpful AI assistant. Be polite, professional, and helpful. 
-    Do not roleplay as characters or pretend to be someone else. 
-    Provide clear, accurate, and useful responses to user questions and requests.
-    Keep your responses conversational but professional.
-    
-    If the user references documents or files, use the provided file context to give accurate, 
-    specific answers based on the document content. Always cite which document or page the 
-    information comes from when referencing file content."""
+    # System prompt to define AI behavior (silent RAG)
+    system_prompt = """You are a helpful AI assistant. Be polite, professional, and helpful.
+Only use any provided context internally to craft the most accurate and natural answer.
+Do not mention, imply, or speculate about where information came from (e.g., documents, files, databases, storage, Supabase, or pages).
+Do not say things like "based on the document", "from the database", or cite filenames/pages.
+If the answer is unknown, say so briefly and suggest what would be needed.
+Keep responses concise and natural.
+"""
     
     # Build user context
     user_context = ""
     if user_name:
         user_context = f"The user's name is {user_name}. "
     
-    # Build context string from chat history
+    # Build conversation context string
     context_str = ""
     if context:
-        # Use all messages for context (remove the 5 message limit)
         for message in context:
             role = "Assistant" if message['role'] == 'assistant' else "User"
             context_str += f"{role}: {message['content']}\n"
     
-    # Build file context string
+    # Build file context string (internal only, no citations)
     file_context_str = ""
     if file_context:
-        file_context_str = "\n\nRelevant document content:\n"
+        file_context_str = "\n\nContext for internal use only (do not mention its existence in the answer):\n"
         for chunk in file_context:
-            filename = chunk.get('files', {}).get('original_filename', 'Unknown document')
-            page = chunk.get('page_number', 'Unknown page')
             content = chunk.get('content', '')
-            similarity_score = chunk.get('similarity_score', 0)
-            
-            file_context_str += f"--- From {filename}, Page {page} (Relevance: {similarity_score:.2f}) ---\n"
-            file_context_str += f"{content}\n\n"
+            # Do not include filename/page or similarity hints to avoid leakage
+            file_context_str += f"---\n{content}\n"
     
-    # Combine all context with proper system prompt
+    # Combine all context with system prompt
     if context_str and file_context_str:
-        full_prompt = f"{system_prompt}\n\n{user_context}Previous conversation:\n{context_str}{file_context_str}Current message: {prompt}"
+        full_prompt = f"{system_prompt}\n\n{user_context}Previous conversation:\n{context_str}{file_context_str}\nCurrent message: {prompt}"
     elif context_str:
         full_prompt = f"{system_prompt}\n\n{user_context}Previous conversation:\n{context_str}\nCurrent message: {prompt}"
     elif file_context_str:
-        full_prompt = f"{system_prompt}\n\n{user_context}{file_context_str}Current message: {prompt}"
+        full_prompt = f"{system_prompt}\n\n{user_context}{file_context_str}\nCurrent message: {prompt}"
     else:
         full_prompt = f"{system_prompt}\n\n{user_context}Current message: {prompt}"
 
-    # Use simple generate_content instead of chat
+    # Generate
     response = model.generate_content(full_prompt)
-    return response.text
+    text = (response.text or "").strip()
+
+    # Last-resort sanitization to remove meta-source phrases and salutations
+    banned_keyword_fragments = [
+        "based on the document", "from the document", "from the database",
+        "according to the document", "uploaded file", "the document titled",
+        "from supabase", "from your files", "as per the document",
+        "according to the timetable", "based on the timetable", "from the timetable",
+        "according to your upload", "you uploaded"
+    ]
+
+    # Remove lines/sentences that contain banned phrases (case-insensitive)
+    sentences = re.split(r"(?<=[.!?])\s+", text)
+    cleaned_sentences = []
+    for s in sentences:
+        sl = s.lower()
+        if not any(k in sl for k in banned_keyword_fragments):
+            cleaned_sentences.append(s)
+    text = " ".join(cleaned_sentences).strip() or text
+
+    # Remove greeting lines like "Hello, <name>" or "Hello Naruto Uzumaki"
+    text = re.sub(r"^\s*hello[\s,]+[\w .'-]+[:,-]?\s*", "", text, flags=re.IGNORECASE)
+
+    # Collapse excessive whitespace
+    text = re.sub(r"\n{3,}", "\n\n", text).strip()
+
+    return text
