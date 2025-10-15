@@ -1,7 +1,6 @@
 import { Header } from "./components/Header"
 import { Router } from "./components/Router"
 import { Footer } from "./components/Footer" 
-import { SupportWidget } from "./components/SupportWidget"
 import MCPToggle from "./components/MCPToggle"
 import { ThemeProvider } from "./components/ThemeProvider"
 import { Toaster } from "./components/ui/sonner"
@@ -71,7 +70,6 @@ export default function App() {
             </ErrorBoundary>
           </main>
           <Footer />
-          <SupportWidget />
           <MCPToggle user={user} />
           
           {/* Admin Link - Always visible to all users */}
