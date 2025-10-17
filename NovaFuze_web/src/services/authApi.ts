@@ -29,6 +29,16 @@ export const clearChat = () => {
   return api.delete('/api/clear-chat');
 };
 
+// Profile management
+export const updateProfile = async (profileData: {
+  displayName?: string;
+  email?: string;
+  phoneNumber?: string;
+}) => {
+  const response = await api.put('/api/profile', profileData);
+  return response.data;
+};
+
 // File management functions
 export const uploadPdf = (file: File) => {
   const formData = new FormData();

@@ -60,7 +60,7 @@ const ProfileDropdown = ({ user, onSignOut }: ProfileDropdownProps) => {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={() => window.location.hash = '#profile'}>
           <User className="mr-2 h-4 w-4" />
           <span>Profile</span>
         </DropdownMenuItem>

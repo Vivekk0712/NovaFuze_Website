@@ -14,25 +14,19 @@ export default function App() {
   const { user, loading } = useAuth();
   const { isAdminAuthenticated, admin } = useAdminAuth();
 
-  // Redirect to home page when user logs in
+  // Redirect to home page when user logs in (but allow navigation to other pages)
   useEffect(() => {
     if (user && !loading) {
       // Clear any stored route information
       sessionStorage.removeItem('lastRoute');
       localStorage.removeItem('lastRoute');
       
-      // Always force home page
-      if (window.location.hash !== '#home') {
-        console.log('Forcing home page redirect');
+      // Only redirect to home if no hash is present (first login)
+      if (!window.location.hash || window.location.hash === '#') {
+        console.log('Redirecting to home page after login');
         window.location.hash = '#home';
-        
-        // If hash doesn't change, force a reload
-        setTimeout(() => {
-          if (window.location.hash !== '#home') {
-            window.location.reload();
-          }
-        }, 100);
       }
+      // Allow navigation to other pages like #payment, #admin, etc.
     }
   }, [user, loading]);
 

@@ -1,6 +1,6 @@
 // Static data for the website
-import tedxImage from "figma:asset/b592f729f3b3f43f2ea6126286ea1d04a87be23d.png";
-import hfbImage from "figma:asset/235600fa74e7c47f9dfc02bbe3fe10e3ea1b948d.png";
+import tedxImage from "../assets/b592f729f3b3f43f2ea6126286ea1d04a87be23d.png";
+import hfbImage from "../assets/235600fa74e7c47f9dfc02bbe3fe10e3ea1b948d.png";
 
 export interface BlogPost {
   id: string
@@ -142,7 +142,7 @@ export const staticProducts: Product[] = [
     id: 'liveeazy',
     name: 'LiveEazy',
     description: 'Comprehensive lifestyle management platform with smart home integration, personal assistant features, and seamless automation for modern living.',
-    price: 799,
+    price: 2,
     currency: 'INR',
     images: ['https://images.unsplash.com/photo-1558618666-fcd25c85cd64?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsaWZlc3R5bGUlMjBtYW5hZ2VtZW50JTIwYXBwfGVufDF8fHx8MTc1ODg5NjIzNnww&ixlib=rb-4.1.0&q=80&w=1080'],
     features: ['Smart home integration', 'Personal assistant AI', 'Automation workflows', 'Lifestyle tracking'],

@@ -358,4 +358,49 @@ router.get('/admin/stats', async (req, res) => {
   }
 });
 
+// Update user profile
+router.put('/profile', verifySession, async (req, res) => {
+  try {
+    const userId = req.user.uid;
+    const { displayName, email, phoneNumber } = req.body;
+
+    // Validate input
+    if (!displayName && !email && !phoneNumber) {
+      return res.status(400).json({ 
+        error: { code: 'BAD_REQUEST', message: 'At least one field is required' } 
+      });
+    }
+
+    // Prepare update data
+    const updateData = {};
+    if (displayName) updateData.displayName = displayName.trim();
+    if (email) updateData.email = email.trim().toLowerCase();
+    if (phoneNumber) updateData.phoneNumber = phoneNumber.trim();
+    
+    updateData.updatedAt = new Date().toISOString();
+
+    // Update user profile in Firestore
+    const userRef = admin.firestore().collection('users').doc(userId);
+    await userRef.update(updateData);
+
+    // Get updated user data
+    const updatedDoc = await userRef.get();
+    const updatedUser = updatedDoc.data();
+
+    console.log(`✅ Profile updated for user ${userId}:`, updateData);
+
+    res.json({
+      success: true,
+      message: 'Profile updated successfully',
+      user: updatedUser
+    });
+
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    res.status(500).json({ 
+      error: { code: 'UPDATE_FAILED', message: 'Failed to update profile' } 
+    });
+  }
+});
+
 module.exports = router;

@@ -4,7 +4,9 @@ import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescri
 import { ThemeToggle } from "./ThemeToggle"
 import ProfileDropdown from "./ProfileDropdown"
 import { useAuth } from "../hooks/useAuth"
-import novaFuzeLogo from "figma:asset/b8120387b6ec249e0e1c5e71a9f6e337f9f42039.png"
+
+// Fallback logo as SVG data URL
+const novaFuzeLogo = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMzIiIGZpbGw9InVybCgjZ3JhZGllbnQwKSIvPgo8dGV4dCB4PSIzMiIgeT0iMzgiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyNCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IndoaXRlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5ORjwvdGV4dD4KPGRlZnM+CjxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZGllbnQwIiB4MT0iMCIgeTE9IjAiIHgyPSI2NCIgeTI9IjY0IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiM2MzY2ZjEiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjOGI1Y2Y2Ii8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+';
 
 export function Header() {
   const { user, signOut } = useAuth();
@@ -72,6 +74,7 @@ export function Header() {
           {/* Enhanced CTA Buttons with stronger prominence */}
           <div className="hidden md:flex items-center space-x-3">
             <ThemeToggle />
+
             <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold" asChild>
               <a href={headerData.buttons.contact.href}>{headerData.buttons.contact.text}</a>
             </Button>

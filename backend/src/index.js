@@ -3,6 +3,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const sessionRoutes = require('./routes/session');
+const paymentRoutes = require('./routes/payment');
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -25,6 +26,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use('/api', sessionRoutes);
+app.use('/api/payment', paymentRoutes);
 
 app.listen(port, () => {
   console.log(`✅ Server running on port ${port}`);

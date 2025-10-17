@@ -159,7 +159,15 @@ export function ProductsGridSection() {
                   <div className="flex gap-3">
                     <Button 
                       className="flex-1 bg-gradient-to-r from-[#4E6BDF] to-[#6B73FF] hover:from-[#3D51D3] hover:to-[#5A64F5] text-white shadow-lg hover:shadow-xl transition-all duration-300 group/btn"
-                      onClick={() => window.location.hash = `products/${product.slug}`}
+                      onClick={() => {
+                        if (product.price === 0) {
+                          window.location.hash = 'contact';
+                        } else if (product.id === 'liveeazy') {
+                          window.location.hash = 'payment';
+                        } else {
+                          window.location.hash = `products/${product.slug}`;
+                        }
+                      }}
                     >
                       {product.price === 0 ? 'Learn More' : 'Get Started'}
                       <ArrowRight className="ml-2 h-4 w-4 group-hover/btn:translate-x-1 transition-transform duration-300" />

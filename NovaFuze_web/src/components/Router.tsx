@@ -25,6 +25,8 @@ import { PrivacyPolicyPage } from "./PrivacyPolicyPage"
 import { TermsOfServicePage } from "./TermsOfServicePage"
 import { RefundPolicyPage } from "./RefundPolicyPage"
 import AdminPage from "../pages/AdminPage"
+import PaymentPage from "./PaymentPage"
+import ProfilePage from "./ProfilePage"
 
 export type Route = 
   | "home" 
@@ -37,6 +39,8 @@ export type Route =
   | "portfolio"
   | "contact"
   | "admin"
+  | "payment"
+  | "profile"
   // Service detail pages
   | "services/web-development"
   | "services/mobile-development"
@@ -140,6 +144,12 @@ export function Router({ onRouteChange }: RouterProps) {
       
       case "admin":
         return <AdminPage />
+      
+      case "payment":
+        return <PaymentPage />
+      
+      case "profile":
+        return <ProfilePage />
       
       // Legal pages
       case "legal/privacy":
