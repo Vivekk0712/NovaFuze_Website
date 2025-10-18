@@ -1,7 +1,7 @@
 export interface ContentBlock {
   id: string
   type: 'text' | 'richText' | 'image' | 'video' | 'button' | 'list' | 'card' | 'hero' | 'section'
-  content: any
+  content: string | Record<string, unknown>
   metadata?: {
     className?: string
     alt?: string
@@ -217,7 +217,7 @@ export interface ContentHistory {
   contentId: string
   contentType: string
   action: 'create' | 'update' | 'delete' | 'publish' | 'unpublish'
-  changes: any
+  changes: Record<string, unknown>
   userId: string
   timestamp: Date
 }

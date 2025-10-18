@@ -28,11 +28,14 @@ export const adminLogin = async (credentials: AdminLoginRequest): Promise<AdminL
   try {
     const response = await api.post('/api/admin/login', credentials);
     return response.data;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Admin login error:', error);
+    const errorMessage = error instanceof Error && 'response' in error 
+      ? (error as any).response?.data?.error?.message || 'Login failed'
+      : 'Login failed';
     return {
       success: false,
-      error: error.response?.data?.error?.message || 'Login failed'
+      error: errorMessage
     };
   }
 };
@@ -45,11 +48,14 @@ export const adminCreate = async (adminData: {
   try {
     const response = await api.post('/api/admin/create', adminData);
     return response.data;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Admin creation error:', error);
+    const errorMessage = error instanceof Error && 'response' in error 
+      ? (error as any).response?.data?.error?.message || 'Admin creation failed'
+      : 'Admin creation failed';
     return {
       success: false,
-      error: error.response?.data?.error?.message || 'Admin creation failed'
+      error: errorMessage
     };
   }
 };
@@ -63,7 +69,7 @@ export const getAdminFiles = async (token: string) => {
       }
     });
     return response.data;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching admin files:', error);
     throw error;
   }
@@ -77,7 +83,7 @@ export const getAdminFileDetails = async (fileId: string, token: string) => {
       }
     });
     return response.data;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching admin file details:', error);
     throw error;
   }
@@ -91,7 +97,7 @@ export const deleteAdminFile = async (fileId: string, token: string) => {
       }
     });
     return response.data;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error deleting admin file:', error);
     throw error;
   }
@@ -105,7 +111,7 @@ export const getAdminStats = async (token: string) => {
       }
     });
     return response.data;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error fetching admin stats:', error);
     throw error;
   }

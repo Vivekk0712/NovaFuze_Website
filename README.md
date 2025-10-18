@@ -1,240 +1,447 @@
-# Firebase Auth App — Phone, Google & Email/Password with AI Chat
+# 🚀 NovaFuze-Tech - Complete Full-Stack Application
 
-A full-stack authentication system with AI-powered chat functionality. Built with React (frontend), Node.js + Express (backend), Python FastAPI (MCP server), Firebase Authentication, and Supabase database. Supports Phone OTP, Google Sign-In, and Email/Password with account linking, plus a ChatGPT-style AI assistant.
+A comprehensive full-stack application with authentication, payments, AI chat, and admin management. Built with React (frontend), Node.js + Express (backend), Python FastAPI (MCP server), Firebase Authentication, Supabase database, and Razorpay payments.
 
-## Features
+## ✨ Features
 
+### 🔐 **Authentication System**
 - Phone OTP (with Firebase reCAPTCHA)
 - Google Sign-In
-- Email/Password login
+- Email/Password login with strength validation
 - Account linking (phone + Google + email)
 - Secure session cookies (HttpOnly, Secure, SameSite=Strict)
-- Firestore rules enforce per-user isolation
-- **AI Chat Assistant** powered by Gemini 2.5 Pro
-- **ChatGPT-style conversation management** with sidebar
-- **Conversation isolation** - each chat maintains separate context
-- **User-aware AI** - AI knows your name and profile information
-- Ready for Firebase Emulator Suite
+- Professional UI with modern animations
 
-## Prerequisites
+### 💳 **Payment Integration**
+- Razorpay payment gateway integration
+- One-time ₹2 LiveEazy product purchase
+- Subscription management system
+- Payment history tracking
+- Automatic email confirmations
+- Test and production mode support
 
-- Node.js >= 18
-- Python 3.10+ and pip
-- A Firebase project (the free tier is sufficient)
-- A Supabase account (for database)
-- Firebase CLI (`npm install -g firebase-tools`)
-- Gemini API key (for AI functionality)
+### 🤖 **AI Chat Assistant**
+- Powered by Gemini 2.5 Pro
+- ChatGPT-style conversation management
+- Context isolation per conversation
+- User-aware AI responses
+- File upload and processing
+- Vector search capabilities
 
-## Getting Started
+### 👨‍💼 **Admin Management**
+- Admin authentication system
+- File management dashboard
+- User management
+- Payment tracking
+- Admin-only routes and permissions
 
-Follow these steps to get the project up and running on your local machine.
+### 📧 **Email Notifications**
+- Payment confirmation emails
+- Professional HTML templates
+- Gmail/SMTP support
+- Error handling and logging
 
-### 1. Clone the Repository
+## 🛠️ Prerequisites
+
+- **Node.js** >= 18
+- **Python** 3.10+ and pip
+- **Firebase project** (free tier sufficient)
+- **Supabase account** (for database)
+- **Razorpay account** (for payments)
+- **Gmail account** (for email notifications)
+- **Gemini API key** (for AI functionality)
+- **Firebase CLI**: `npm install -g firebase-tools`
+
+## 🚀 Quick Start
+
+### 1. **Clone the Repository**
 
 ```bash
-git clone https://github.com/your-username/my-auth-app.git
-cd my-auth-app
+git clone https://github.com/your-username/novafuze-tech.git
+cd novafuze-tech
 ```
 
-### 2. Install Dependencies
+### 2. **Install Dependencies**
 
 ```bash
 # Backend
 cd backend && npm install
 
 # Frontend
-cd ../frontend && npm install
+cd ../NovaFuze_web && npm install
 
 # MCP Server (Python)
 cd ../mcp_server
 python -m venv venv
-source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 3. Firebase Project Setup
+## 🔧 Configuration Setup
 
-#### a. Create a Firebase Project
-1.  Go to the [Firebase Console](https://console.firebase.google.com/).
-2.  Click on "Add project" and follow the steps to create a new project.
+### 3. **Firebase Project Setup**
+
+#### a. Create Firebase Project
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Click "Add project" and create a new project
+3. Enable **Authentication**, **Firestore**, and **Storage**
 
 #### b. Enable Authentication Providers
-1.  In your new project, go to the **Authentication** section (from the left-hand menu).
-2.  Click on the "Sign-in method" tab.
-3.  Enable the following providers:
-    *   **Email/Password**
-    *   **Google**
-    *   **Phone**
+1. Go to **Authentication** → **Sign-in method**
+2. Enable: **Email/Password**, **Google**, **Phone**
 
-#### c. Get Frontend Configuration
-1.  Go to your **Project Settings** (click the gear icon next to "Project Overview").
-2.  In the "General" tab, scroll down to "Your apps".
-3.  Click on the **Web** icon (`</>`) to create a new web app.
-4.  Give it a nickname and register the app.
-5.  Firebase will give you a `firebaseConfig` object. You will need these values for your `frontend/.env` file.
+#### c. Get Configuration Keys
+1. **Project Settings** → **General** → **Your apps**
+2. Click Web icon (`</>`) to create web app
+3. Copy the `firebaseConfig` values
 
-#### d. Get Backend Configuration (Service Account)
-1.  In your **Project Settings**, go to the "Service accounts" tab.
-2.  Click on "Generate new private key". This will download a JSON file.
-3.  Rename this file to `serviceAccount.json` and place it in the `backend` directory.
+#### d. Service Account Setup
+1. **Project Settings** → **Service accounts**
+2. Click "Generate new private key"
+3. Save as `serviceAccount.json` in `backend/` directory
 
-#### e. Get reCAPTCHA Key for Phone Auth
-1.  Phone authentication uses reCAPTCHA to prevent abuse.
-2.  Go to the [Google Cloud Console](https://console.cloud.google.com/security/recaptcha) and set up a new reCAPTCHA v3 key.
-3.  You will get a "Site Key". This is the value for `VITE_RECAPTCHA_SITE_KEY` in your `frontend/.env` file.
+#### e. reCAPTCHA Setup
+1. Go to [Google Cloud Console reCAPTCHA](https://console.cloud.google.com/security/recaptcha)
+2. Create reCAPTCHA v3 key
+3. Copy the Site Key
 
-#### f. Set up Firestore
-1.  In the Firebase Console, go to the **Firestore Database** section.
-2.  Click "Create database" and start in **test mode**.
+### 4. **Supabase Database Setup**
 
-### 4. Supabase Database Setup
+#### a. Create Supabase Project
+1. Go to [Supabase Dashboard](https://app.supabase.io/)
+2. Create new project
+3. Go to **Settings** → **API**
+4. Copy **Project URL** and **Service Role Key**
 
-#### a. Create a Supabase Project
-1. Go to the [Supabase Dashboard](https://app.supabase.io/) and create a new project.
-2. Once the project is created, navigate to the **Project Settings** > **API** section.
-3. You will need two pieces of information from this page for your `.env` files:
-   - **Project URL** (looks like `https://<your-project-ref>.supabase.co`)
-   - **Service Role Key** (under "Project API keys"). This key bypasses Row Level Security and should be kept secret.
+#### b. Setup Database Schema
+1. Go to **SQL Editor** in Supabase
+2. Copy content from `mcp_server/db/schema.sql`
+3. Paste and **Run** the SQL script
 
-#### b. Create Database Schema
-1. In your Supabase project, go to the **SQL Editor**.
-2. Click on **New query**.
-3. Copy the entire content of the `mcp_server/db/schema.sql` file and paste it into the SQL editor.
-4. Click **Run** to execute the script. This will create the `users`, `conversations`, `messages`, and `embeddings` tables.
-
-### 5. Gemini API Setup
-1. Go to the [Google AI Studio](https://aistudio.google.com/) to get your Gemini API key.
-2. Create a new API key and copy it - you'll need this for the MCP server configuration.
-
-### 6. Configure Environment Variables
-
-Create a `.env` file in the `frontend`, `backend`, and `mcp_server` directories.
-
-**`frontend/.env`**
+#### c. Setup Storage Buckets (Required for File Uploads)
+```bash
+cd mcp_server
+source venv/bin/activate  # Windows: venv\Scripts\activate
+python setup_storage.py
 ```
+
+**What this does:**
+- Creates `files` storage bucket in Supabase
+- Configures file type restrictions (PDF, DOC, TXT, etc.)
+- Sets 50MB file size limit
+- Enables secure file storage for AI chat and admin features
+
+**Expected output:**
+```
+🚀 Supabase Storage Setup
+Successfully created bucket: files
+Supported file types:
+- application/pdf
+- text/plain
+- application/vnd.openxmlformats-officedocument.wordprocessingml.document
+- [... other supported types]
+```
+
+### 5. **Razorpay Payment Setup**
+
+#### a. Create Razorpay Account
+1. Go to [Razorpay Dashboard](https://dashboard.razorpay.com)
+2. Sign up and switch to **Test Mode**
+3. Go to **Settings** → **API Keys**
+4. Generate and copy **Key ID** and **Key Secret**
+
+### 6. **Email Configuration**
+
+#### a. Gmail Setup (Recommended)
+1. Enable 2-Factor Authentication on Gmail
+2. Go to **Security** → **App passwords**
+3. Generate app password for "Mail"
+4. Copy the 16-character password
+
+### 7. **Gemini API Setup**
+1. Go to [Google AI Studio](https://aistudio.google.com/)
+2. Create new API key
+3. Copy the API key
+
+## 📝 Environment Variables
+
+Create `.env` files in each directory:
+
+### **`NovaFuze_web/.env`**
+```env
 VITE_API_BASE_URL=http://localhost:4000
-VITE_FIREBASE_API_KEY=your-api-key-from-step-3c
-VITE_FIREBASE_AUTH_DOMAIN=your-project-id.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=your-project-id
-VITE_FIREBASE_APP_ID=your-app-id
-VITE_RECAPTCHA_SITE_KEY=your-recaptcha-site-key-from-step-3e
+VITE_FIREBASE_API_KEY=your_firebase_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your_project_id
+VITE_FIREBASE_APP_ID=your_firebase_app_id
+VITE_RECAPTCHA_SITE_KEY=your_recaptcha_site_key
 ```
 
-**`backend/.env`**
-```
+### **`backend/.env`**
+```env
+# Server Configuration
 PORT=4000
-FIREBASE_PROJECT_ID=your-project-id
+NODE_ENV=development
+
+# Firebase Configuration
+FIREBASE_PROJECT_ID=your_project_id
 GOOGLE_APPLICATION_CREDENTIALS=./serviceAccount.json
+
+# Session Configuration
 SESSION_COOKIE_NAME=__session
-SESSION_EXPIRES_IN=432000000   # 5 days in ms
+SESSION_EXPIRES_IN=432000000
+
+# Razorpay Configuration (Test Mode)
+RAZORPAY_KEY_ID=rzp_test_your_key_id
+RAZORPAY_KEY_SECRET=your_key_secret
+
+# Email Configuration
+EMAIL_SERVICE=gmail
+EMAIL_USER=your_business_email@gmail.com
+EMAIL_PASS=your_16_character_app_password
+EMAIL_FROM_NAME=NovaFuze-Tech
+EMAIL_FROM_ADDRESS=your_business_email@gmail.com
+
+# MCP Server
 MCP_SERVER_URL=http://localhost:8000
+```
+
+### **`mcp_server/.env`**
+```env
+# Supabase Configuration
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+
+# AI Configuration
+GEMINI_API_KEY=your_gemini_api_key
+
+# Environment
 NODE_ENV=development
 ```
 
-**`mcp_server/.env`**
+## 🎯 Initial Setup Commands
+
+### 8. **Setup Supabase Storage**
+```bash
+cd mcp_server
+source venv/bin/activate  # Windows: venv\Scripts\activate
+python setup_storage.py
 ```
-SUPABASE_URL=your-supabase-project-url
-SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
-GEMINI_API_KEY=your-gemini-api-key
-NODE_ENV=development
+This creates storage buckets for file uploads and AI document processing.
+
+### 9. **Create Admin User**
+```bash
+cd mcp_server
+python create_admin.py
 ```
+Follow the prompts to create your first admin user.
 
-### 7. Deploy Firestore Rules
-
-To deploy the security rules for Firestore, run the following command from the root of the project:
-
+### 10. **Deploy Firestore Rules**
 ```bash
 firebase deploy --only firestore:rules
 ```
 
-## Running the Application
+## 🏃‍♂️ Running the Application
 
-You need to run all three services simultaneously in separate terminals.
+Start all three services in separate terminals:
 
-### Start the Backend
+### **Terminal 1 - Backend**
 ```bash
 cd backend
 npm run dev
 ```
-The backend server will start on `http://localhost:4000`.
+Server starts on `http://localhost:4000`
 
-### Start the MCP Server
+### **Terminal 2 - MCP Server**
 ```bash
 cd mcp_server
-source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+source venv/bin/activate  # Windows: venv\Scripts\activate
 uvicorn main:app --reload
 ```
-The MCP server will start on `http://localhost:8000`.
+Server starts on `http://localhost:8000`
 
-### Start the Frontend
+### **Terminal 3 - Frontend**
 ```bash
-cd frontend
+cd NovaFuze_web
 npm run dev
 ```
-The frontend development server will start, usually on `http://localhost:5173`.
+Server starts on `http://localhost:5173`
 
-### Run with Firebase Emulator
-To develop locally without connecting to your live Firebase project, you can use the Firebase Emulator Suite.
+## 🧪 Testing the Application
+
+### **Test Authentication**
+1. Navigate to `http://localhost:5173`
+2. Try all auth methods: Email, Phone, Google
+3. Test with these credentials:
+   - **Email**: test@example.com / password123
+   - **Phone**: Use any number with test OTP
+   - **Google**: Use your Google account
+
+### **Test Payments**
+1. Go to Products section
+2. Click "Get Started" on LiveEazy (₹2)
+3. Use Razorpay test credentials:
+   - **Card**: 4111 1111 1111 1111
+   - **Expiry**: 12/25
+   - **CVV**: 123
+
+### **Test AI Chat**
+1. Login to the application
+2. Navigate to Chat section
+3. Start a conversation with the AI
+4. Test file uploads and questions
+
+### **Test Admin Panel**
+1. Go to `/admin` route
+2. Login with admin credentials created earlier
+3. Test file management and user oversight
+
+## 📁 Project Structure
+
+```
+novafuze-tech/
+├── backend/                 # Node.js + Express API
+│   ├── src/
+│   │   ├── routes/         # API routes
+│   │   ├── services/       # Business logic
+│   │   └── middleware/     # Auth & validation
+│   └── serviceAccount.json # Firebase credentials
+├── NovaFuze_web/           # React frontend
+│   ├── src/
+│   │   ├── components/     # React components
+│   │   ├── pages/          # Page components
+│   │   ├── services/       # API calls
+│   │   └── hooks/          # Custom hooks
+│   └── public/
+├── mcp_server/             # Python FastAPI server
+│   ├── tools/              # AI tools & utilities
+│   ├── db/                 # Database schemas
+│   └── create_admin.py     # Admin setup script
+├── docs/                   # Documentation
+└── README.md              # This file
+```
+
+## 🔒 Security Features
+
+- **Authentication**: Firebase Auth with session cookies
+- **Authorization**: Role-based access control
+- **Payment Security**: Razorpay signature verification
+- **Data Protection**: Firestore security rules
+- **Email Security**: App passwords and secure SMTP
+- **API Security**: CORS, rate limiting, input validation
+
+## 🎨 UI/UX Features
+
+- **Modern Design**: Professional, responsive interface
+- **Animations**: Smooth Framer Motion animations
+- **Loading States**: Comprehensive loading indicators
+- **Error Handling**: User-friendly error messages
+- **Accessibility**: Full keyboard navigation and screen reader support
+- **Mobile Responsive**: Optimized for all device sizes
+
+## 🚀 Production Deployment
+
+### **Environment Setup**
+1. Switch Razorpay to Live Mode
+2. Use production Firebase project
+3. Configure production Supabase
+4. Set up custom domain email
+5. Update environment variables
+
+### **Security Checklist**
+- [ ] Enable Firestore security rules
+- [ ] Use HTTPS for all endpoints
+- [ ] Secure environment variables
+- [ ] Enable CORS properly
+- [ ] Set up monitoring and logging
+
+## 🛠️ Troubleshooting
+
+### **Common Issues**
+
+**Authentication not working:**
+- Check Firebase configuration
+- Verify reCAPTCHA keys
+- Ensure service account is properly set
+
+**Payments failing:**
+- Verify Razorpay keys are correct
+- Check test mode vs live mode
+- Ensure webhook signatures match
+
+**AI chat not responding:**
+- Check Gemini API key
+- Verify Supabase connection
+- Ensure MCP server is running
+
+**File uploads failing:**
+- Run `python setup_storage.py` to create storage buckets
+- Check Supabase storage permissions
+- Verify file types are supported (PDF, DOC, TXT, etc.)
+- Ensure file size is under 50MB limit
+
+**Emails not sending:**
+- Verify Gmail app password
+- Check email service configuration
+- Ensure 2FA is enabled on Gmail
+
+### **Debug Commands**
 
 ```bash
-firebase emulators:start --only auth,firestore
+# Check backend logs
+cd backend && npm run dev
+
+# Check MCP server logs
+cd mcp_server && uvicorn main:app --reload --log-level debug
+
+# Test database connection
+cd mcp_server && python -c "from supabase_client import init_supabase; print('DB OK' if init_supabase() else 'DB Failed')"
+
+# Test email configuration
+cd backend && node test-email.js
+
+# Test payment endpoints
+cd backend && node test-payment.js
 ```
 
-## Repository Structure
+## 📚 API Documentation
 
-```
-/my-auth-app
-  /backend
-    /src
-      /routes
-      /middleware
-      /services
-  /frontend
-    /src
-      /components
-      /pages
-      /services
-  /mcp_server
-    /tools
-    /db
-  /docs
-  README.md
-  firebase.json
-  firebase.rules
-```
+### **Authentication Endpoints**
+- `POST /api/auth/session-login` - Create session
+- `POST /api/auth/session-logout` - Destroy session
+- `GET /api/auth/verify-session` - Verify session
 
-## Testing
+### **Payment Endpoints**
+- `POST /api/payment/create-order` - Create payment order
+- `POST /api/payment/verify-payment` - Verify payment
+- `GET /api/payment/subscription-status` - Get subscription
+- `GET /api/payment/payment-history` - Get payment history
 
-- **Unit tests:** Jest + Supertest (backend), React Testing Library (frontend)
-- **E2E:** Playwright or Cypress with Firebase Emulator
+### **Admin Endpoints**
+- `POST /api/admin/login` - Admin login
+- `GET /api/admin/files` - List files
+- `DELETE /api/admin/files/:id` - Delete file
+- `GET /api/admin/stats` - Get statistics
 
-## Security
+## 🤝 Contributing
 
-- Session cookies are HttpOnly, Secure, SameSite=Strict
-- reCAPTCHA required for phone OTP
-- Strong password policy for email/password
-- Firestore rules prevent cross-user access
+1. Fork the repository
+2. Create feature branch: `git checkout -b feature/amazing-feature`
+3. Commit changes: `git commit -m 'Add amazing feature'`
+4. Push to branch: `git push origin feature/amazing-feature`
+5. Open Pull Request
 
-## AI Chat Features
+## 📄 License
 
-- **Gemini 2.5 Pro Integration**: Powered by Google's latest AI model
-- **Conversation Management**: ChatGPT-style sidebar with conversation history
-- **Context Isolation**: Each conversation maintains separate context
-- **User Awareness**: AI knows your name and profile information
-- **Message History**: Persistent chat history stored in Supabase
-- **Real-time Chat**: Instant responses with loading indicators
-- **Fullscreen Mode**: Immersive chat experience
-- **Conversation CRUD**: Create, switch, and delete conversations
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Roadmap
+## 🆘 Support
 
-- Password reset & email verification
-- Roles (admin/user)
-- Multi-factor auth (MFA)
-- AI conversation search and filtering
-- Message export functionality
-- Deployment (Netlify + Render/Cloud Run)
+For support and questions:
+- 📧 Email: support@novafuze-tech.com
+- 📱 Phone: +91-XXXXXXXXXX
+- 🌐 Website: [novafuze-tech.com](https://novafuze-tech.com)
 
-## License
+---
 
-MIT
+**🎉 Congratulations!** You now have a complete full-stack application with authentication, payments, AI chat, and admin management running locally!

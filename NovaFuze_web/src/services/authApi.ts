@@ -21,7 +21,7 @@ export const getHistory = () => {
   return api.get('/api/history');
 };
 
-export const sendMessage = (message: string, metadata?: any) => {
+export const sendMessage = (message: string, metadata?: Record<string, unknown>) => {
   return api.post('/api/chat', { message, metadata });
 };
 

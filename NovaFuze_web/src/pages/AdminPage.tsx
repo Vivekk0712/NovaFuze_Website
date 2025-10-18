@@ -316,7 +316,7 @@ export default function AdminPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
                           <div className="text-sm font-medium text-gray-900">
-                            {file.users.name || 'Unknown'}
+                            {file.users?.name || 'Unknown'}
                           </div>
                           <div className="text-sm text-gray-500">
                             {file.users.email || 'No email'}

@@ -196,11 +196,11 @@
  * // Programmatic usage
  * NovaFuzeTheme.set('dark');
  * NovaFuzeTheme.toggle();
- * console.log(NovaFuzeTheme.get()); // Current theme preference
- * console.log(NovaFuzeTheme.getResolved()); // Actual theme being shown
+ * NovaFuzeTheme.get(); // Current theme preference
+ * NovaFuzeTheme.getResolved(); // Actual theme being shown
  * 
  * // Listen for theme changes
  * window.addEventListener('themechange', (e) => {
- *   console.log('Theme changed to:', e.detail.theme);
+ *   // Handle theme change: e.detail.theme
  * });
  */

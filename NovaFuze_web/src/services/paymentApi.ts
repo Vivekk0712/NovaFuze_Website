@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:4000';
+const API_BASE_URL = (import.meta.env?.VITE_API_BASE_URL as string) || 'http://localhost:4000';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -106,8 +106,8 @@ export const handleRazorpayPayment = (
   razorpayKey: string,
   userDetails: { name?: string; email?: string; contact?: string },
   productName: string,
-  onSuccess: (response: any) => void,
-  onError: (error: any) => void
+  onSuccess: (response: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string }) => void,
+  onError: (error: { message: string }) => void
 ) => {
   const options = {
     key: razorpayKey,
@@ -124,7 +124,7 @@ export const handleRazorpayPayment = (
     theme: {
       color: '#7c3aed',
     },
-    handler: function (response: any) {
+    handler: function (response: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string }) {
       onSuccess(response);
     },
     modal: {

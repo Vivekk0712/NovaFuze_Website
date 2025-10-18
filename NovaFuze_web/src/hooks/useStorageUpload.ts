@@ -61,12 +61,13 @@ export const useStorageUpload = () => {
       })
 
       return result
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Upload error:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Upload failed';
       setUploadState({
         isUploading: false,
         progress: 0,
-        error: error.message || 'Upload failed',
+        error: errorMessage,
         success: false
       })
       return null
@@ -105,12 +106,13 @@ export const useStorageUpload = () => {
       })
 
       return result
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Upload error:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Upload failed';
       setUploadState({
         isUploading: false,
         progress: 0,
-        error: error.message || 'Upload failed',
+        error: errorMessage,
         success: false
       })
       return null
@@ -160,12 +162,13 @@ export const useStorageUpload = () => {
       })
 
       return results
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Multiple upload error:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Multiple upload failed';
       setUploadState({
         isUploading: false,
         progress: 0,
-        error: error.message || 'Multiple upload failed',
+        error: errorMessage,
         success: false
       })
       return []
@@ -176,11 +179,12 @@ export const useStorageUpload = () => {
     try {
       await StorageService.deleteFile(filePath)
       return true
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Delete error:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Delete failed';
       setUploadState(prev => ({ 
         ...prev, 
-        error: error.message || 'Delete failed' 
+        error: errorMessage
       }))
       return false
     }
@@ -189,11 +193,12 @@ export const useStorageUpload = () => {
   const getFileURL = useCallback(async (filePath: string): Promise<string | null> => {
     try {
       return await StorageService.getFileURL(filePath)
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Get URL error:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Failed to get file URL';
       setUploadState(prev => ({ 
         ...prev, 
-        error: error.message || 'Failed to get file URL' 
+        error: errorMessage
       }))
       return null
     }
@@ -202,11 +207,12 @@ export const useStorageUpload = () => {
   const listFiles = useCallback(async (pathPrefix: string) => {
     try {
       return await StorageService.listFiles(pathPrefix)
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('List files error:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Failed to list files';
       setUploadState(prev => ({ 
         ...prev, 
-        error: error.message || 'Failed to list files' 
+        error: errorMessage
       }))
       return []
     }
