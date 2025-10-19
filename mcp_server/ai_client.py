@@ -6,6 +6,53 @@ genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
 model = genai.GenerativeModel('gemini-2.5-pro')
 
+def expand_query(query: str, conversation_context: list[dict] = None) -> list[str]:
+    """
+    Expand user query with synonyms and alternative phrasings for better retrieval
+    
+    Args:
+        query: Original user query
+        conversation_context: Recent conversation for context
+        
+    Returns:
+        List of expanded queries (including original)
+    """
+    try:
+        # Build context string
+        context_str = ""
+        if conversation_context and len(conversation_context) > 0:
+            recent_context = conversation_context[-3:]  # Last 3 messages
+            for msg in recent_context:
+                role = "User" if msg['role'] == 'user' else "Assistant"
+                context_str += f"{role}: {msg['content']}\n"
+        
+        expansion_prompt = f"""Given this conversation context and user query, generate 2 alternative phrasings that capture the same intent.
+Include synonyms and related terms. Keep each alternative concise (one line).
+
+{context_str if context_str else "No prior context."}
+
+User Query: {query}
+
+Generate 2 alternative queries (one per line, no numbering):"""
+        
+        response = model.generate_content(expansion_prompt)
+        expanded = response.text.strip().split('\n')
+        
+        # Clean and filter expansions
+        expansions = [query]  # Always include original
+        for exp in expanded[:2]:  # Take top 2
+            exp = exp.strip()
+            # Remove numbering, bullets, etc.
+            exp = re.sub(r'^[\d\.\-\*\)]+\s*', '', exp)
+            if exp and exp != query and len(exp) > 3:
+                expansions.append(exp)
+        
+        return expansions[:3]  # Max 3 total (original + 2 expansions)
+        
+    except Exception as e:
+        print(f"Query expansion failed: {e}")
+        return [query]  # Fallback to original query
+
 def generate_from_prompt(prompt: str, context: list[dict], user_name: str = None, file_context: list[dict] = None):
     """
     Generates a response from the Gemini model with optional file context.

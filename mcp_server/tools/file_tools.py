@@ -7,50 +7,50 @@ import PyPDF2
 import io
 import json
 
-# Simple embedding using TF-IDF-like approach
-EMBEDDING_DIM = 1536  # Match database schema expectation
-
-def generate_embedding(text: str) -> List[float]:
-    """Generate simple embedding for given text using hash-based approach"""
-    try:
-        # Simple hash-based embedding for now
-        # In production, you'd use a proper embedding model
-        import hashlib
-        
-        # Generate exactly 1536 dimensions
-        embeddings = []
-        
-        # Use the text to generate consistent hash-based embeddings
-        base_text = text if text else "empty"
-        
-        # Generate 1536 values by using different hash inputs
-        for i in range(1536):
-            # Create different hash inputs for each dimension
-            hash_input = f"{base_text}_{i}_{len(base_text)}".encode()
+# Import enhanced embedding functions
+try:
+    from embeddings import generate_embedding, generate_embeddings_batch, rerank_results, EMBEDDING_DIM
+    SEMANTIC_EMBEDDINGS_AVAILABLE = True
+    print("✅ Semantic embeddings enabled (Sentence Transformers)")
+except ImportError:
+    print("⚠️  Semantic embeddings not available, using fallback hash-based embeddings")
+    SEMANTIC_EMBEDDINGS_AVAILABLE = False
+    EMBEDDING_DIM = 384  # Match Sentence Transformers dimension
+    
+    def generate_embedding(text: str) -> List[float]:
+        """Fallback hash-based embedding if Sentence Transformers not available"""
+        try:
+            import hashlib
+            embeddings = []
+            base_text = text if text else "empty"
             
-            # Use different hash algorithms based on position
-            if i % 4 == 0:
-                hash_obj = hashlib.md5(hash_input)
-            elif i % 4 == 1:
-                hash_obj = hashlib.sha1(hash_input)
-            elif i % 4 == 2:
-                hash_obj = hashlib.sha256(hash_input)
-            else:
-                hash_obj = hashlib.blake2b(hash_input, digest_size=8)
+            for i in range(EMBEDDING_DIM):
+                hash_input = f"{base_text}_{i}_{len(base_text)}".encode()
+                if i % 4 == 0:
+                    hash_obj = hashlib.md5(hash_input)
+                elif i % 4 == 1:
+                    hash_obj = hashlib.sha1(hash_input)
+                elif i % 4 == 2:
+                    hash_obj = hashlib.sha256(hash_input)
+                else:
+                    hash_obj = hashlib.blake2b(hash_input, digest_size=8)
+                
+                hash_bytes = hash_obj.digest()
+                byte_value = hash_bytes[i % len(hash_bytes)]
+                embeddings.append(float(byte_value) / 255.0)
             
-            # Get hash bytes and convert to float
-            hash_bytes = hash_obj.digest()
-            # Use the first byte of the hash for this dimension
-            byte_value = hash_bytes[i % len(hash_bytes)]
-            embeddings.append(float(byte_value) / 255.0)
-        
-        # Ensure we have exactly 1536 dimensions
-        assert len(embeddings) == 1536, f"Expected 1536 dimensions, got {len(embeddings)}"
-        return embeddings
-        
-    except Exception as e:
-        print(f"Error generating embedding: {e}")
-        return [0.0] * 1536
+            return embeddings
+        except Exception as e:
+            print(f"Error generating embedding: {e}")
+            return [0.0] * EMBEDDING_DIM
+    
+    def generate_embeddings_batch(texts: List[str], batch_size: int = 32) -> List[List[float]]:
+        """Fallback batch embedding"""
+        return [generate_embedding(text) for text in texts]
+    
+    def rerank_results(query: str, documents: List[str], top_k: Optional[int] = None) -> List[tuple]:
+        """Fallback re-ranking (no-op)"""
+        return [(idx, 0.5) for idx in range(len(documents))]
 
 def extract_text_from_file(file_content: bytes, filename: str) -> Dict[str, Any]:
     """
@@ -324,28 +324,45 @@ def get_file_by_id(file_id: str) -> Optional[Dict[str, Any]]:
         print(f"Error fetching file: {e}")
         return None
 
-def search_similar_chunks(query: str, user_id: str, limit: int = 5) -> List[Dict[str, Any]]:
-    """Search for similar file chunks using pgvector similarity if available, else fallback."""
+def search_similar_chunks(query: str, user_id: str, limit: int = 5, use_reranking: bool = True) -> List[Dict[str, Any]]:
+    """
+    Search for similar file chunks using semantic vector similarity with optional re-ranking
+    
+    Args:
+        query: Search query
+        user_id: Firebase user ID
+        limit: Number of results to return
+        use_reranking: Whether to use cross-encoder re-ranking for better results
+        
+    Returns:
+        List of matching chunks with similarity scores
+    """
     try:
         from supabase_client import supabase, get_or_create_user
         if supabase is None:
             print("Supabase client not initialized")
             return []
+        
         # Map Firebase UID to UUID
         user_record = get_or_create_user(user_id)
         user_uuid = user_record['id']
-        # Generate query embedding (1536-dim) using the same embedding generator
+        
+        # Generate query embedding using semantic embeddings
         query_vector = generate_embedding(query)
+        
+        # Retrieve more candidates for re-ranking (if enabled)
+        initial_limit = limit * 3 if use_reranking and SEMANTIC_EMBEDDINGS_AVAILABLE else limit
+        
         # Call RPC for vector similarity
         try:
             rpc_resp = supabase.rpc('match_file_chunks', {
                 'query_embedding': query_vector,
-                'match_count': limit,
+                'match_count': initial_limit,
                 'user_uuid': user_uuid
             }).execute()
+            
             if rpc_resp.data:
-                # Normalize shape to match previous output used by the caller
-                return [
+                results = [
                     {
                         'id': row['id'],
                         'content': row['content'],
@@ -355,21 +372,54 @@ def search_similar_chunks(query: str, user_id: str, limit: int = 5) -> List[Dict
                     }
                     for row in rpc_resp.data
                 ]
+                
+                # Apply re-ranking if enabled and available
+                if use_reranking and SEMANTIC_EMBEDDINGS_AVAILABLE and len(results) > 1:
+                    try:
+                        # Extract documents for re-ranking
+                        documents = [r['content'] for r in results]
+                        
+                        # Re-rank using cross-encoder
+                        ranked_indices = rerank_results(query, documents, top_k=limit)
+                        
+                        # Reorder results based on re-ranking scores
+                        reranked_results = []
+                        for idx, rerank_score in ranked_indices:
+                            result = results[idx].copy()
+                            result['rerank_score'] = rerank_score
+                            result['original_similarity'] = result['similarity_score']
+                            result['similarity_score'] = rerank_score  # Use rerank score as primary
+                            reranked_results.append(result)
+                        
+                        print(f"✅ Re-ranked {len(results)} results to top {len(reranked_results)}")
+                        return reranked_results
+                        
+                    except Exception as rerank_error:
+                        print(f"⚠️  Re-ranking failed, using vector similarity: {rerank_error}")
+                        return results[:limit]
+                
+                return results[:limit]
+                
         except Exception as e:
             print(f"Vector RPC failed, falling back to text overlap: {e}")
+        
         # Fallback: simple text overlap across user's files
         user_files = get_user_files(user_id)
         if not user_files:
             return []
+        
         file_ids = [f['id'] for f in user_files]
         response = supabase.table('file_chunks').select(
             'id, content, page_number, file_id, files!inner(filename, original_filename)'
         ).in_('file_id', file_ids).execute()
+        
         if not response.data:
             return []
+        
         chunks_with_scores = []
         query_lower = query.lower()
         query_words = set(query_lower.split())
+        
         for chunk in response.data:
             content_lower = (chunk['content'] or '').lower()
             content_words = set(content_lower.split())
@@ -377,8 +427,10 @@ def search_similar_chunks(query: str, user_id: str, limit: int = 5) -> List[Dict
             score = overlap / len(query_words) if query_words else 0
             if score > 0:
                 chunks_with_scores.append({ **chunk, 'similarity_score': score })
+        
         chunks_with_scores.sort(key=lambda x: x['similarity_score'], reverse=True)
         return chunks_with_scores[:limit]
+        
     except Exception as e:
         print(f"Error searching similar chunks: {e}")
         return []

@@ -8,11 +8,11 @@ def init_supabase(url: str, key: str):
     try:
         supabase = create_client(url, key)
         print(f"DEBUG: Supabase client initialized successfully")
-        return True
+        return supabase
     except Exception as e:
         print(f"ERROR: Failed to initialize Supabase client: {e}")
         supabase = None
-        return False
+        return None
 
 def get_or_create_user(firebase_uid: str, email: str = None, name: str = None):
     print(f"DEBUG: get_or_create_user called with firebase_uid={firebase_uid}, email={email}, name={name}")
