@@ -3,6 +3,10 @@ import { Form, Button, Card, Spinner, InputGroup } from 'react-bootstrap';
 import { X, Fullscreen, FullscreenExit, Trash } from 'react-bootstrap-icons';
 import { getHistory, sendMessage, clearChat } from '../services/authApi';
 
+// App-specific identifier for localStorage isolation
+// This prevents conflicts when running multiple app instances
+const APP_ID = import.meta.env.VITE_APP_ID || 'default-app';
+
 interface User {
   uid: string;
   email: string;
@@ -22,11 +26,12 @@ const ChatBot = ({ user, onToggleFullscreen, isFullscreen = false }: ChatBotProp
   const [loading, setLoading] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
-  // Load chat history from localStorage (user-specific)
+  // Load chat history from localStorage (app-specific and user-specific)
   useEffect(() => {
     if (user?.uid) {
-      const savedHistory = localStorage.getItem(`chatHistory_${user.uid}`);
-      console.log('DEBUG: Loading from localStorage:', savedHistory);
+      const storageKey = `${APP_ID}_chatHistory_${user.uid}`;
+      const savedHistory = localStorage.getItem(storageKey);
+      console.log(`DEBUG: Loading from localStorage [${storageKey}]:`, savedHistory);
       if (savedHistory) {
         try {
           const parsedHistory = JSON.parse(savedHistory);
@@ -42,8 +47,9 @@ const ChatBot = ({ user, onToggleFullscreen, isFullscreen = false }: ChatBotProp
   // Save chat history to localStorage whenever it changes
   useEffect(() => {
     if (user?.uid && chatHistory.length > 0) {
-      localStorage.setItem(`chatHistory_${user.uid}`, JSON.stringify(chatHistory));
-      console.log('DEBUG: Saved to localStorage:', chatHistory);
+      const storageKey = `${APP_ID}_chatHistory_${user.uid}`;
+      localStorage.setItem(storageKey, JSON.stringify(chatHistory));
+      console.log(`DEBUG: Saved to localStorage [${storageKey}]:`, chatHistory);
     }
   }, [chatHistory, user?.uid]);
 
@@ -98,11 +104,12 @@ const ChatBot = ({ user, onToggleFullscreen, isFullscreen = false }: ChatBotProp
         setLoading(true);
         await clearChat();
         setChatHistory([]);
-        // Also clear localStorage
+        // Also clear app-specific localStorage
         if (user?.uid) {
-          localStorage.removeItem(`chatHistory_${user.uid}`);
+          const storageKey = `${APP_ID}_chatHistory_${user.uid}`;
+          localStorage.removeItem(storageKey);
+          console.log(`Chat history cleared successfully [${storageKey}]`);
         }
-        console.log('Chat history cleared successfully');
       } catch (error) {
         console.error('Error clearing chat history:', error);
         alert('Failed to clear chat history. Please try again.');

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
@@ -73,12 +73,12 @@ const PaymentPage = () => {
                 orderResponse.order,
                 orderResponse.key,
                 {
-                    name: purchaseStatus?.user?.displayName || user.displayName || user.email || '',
-                    email: purchaseStatus?.user?.email || user.email || '',
-                    contact: purchaseStatus?.user?.phoneNumber || user.providerData?.find(p => p.providerId === 'phone')?.phoneNumber || ''
+                    name: user.displayName || user.email || '',
+                    email: user.email || '',
+                    contact: user.phoneNumber || ''
                 },
                 productDetails.name,
-                async (response: any) => {
+                async (response) => {
                     // Payment successful, verify on backend
                     try {
                         const verifyResponse = await verifyPayment({
@@ -102,7 +102,7 @@ const PaymentPage = () => {
                         setLoading(false);
                     }
                 },
-                (error: any) => {
+                (error) => {
                     console.error('Payment error:', error);
                     toast.error(error.message || 'Payment failed');
                     setLoading(false);
@@ -114,8 +114,6 @@ const PaymentPage = () => {
             setLoading(false);
         }
     };
-
-
 
     const goBack = () => {
         window.history.back();
@@ -299,8 +297,6 @@ const PaymentPage = () => {
                                         </>
                                     )}
                                 </Button>
-
-
 
                                 {/* Payment Methods Info */}
                                 <div className="text-center text-sm text-gray-500">

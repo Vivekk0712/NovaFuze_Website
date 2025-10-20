@@ -54,12 +54,12 @@ const LoginPage = () => {
       {/* Floating Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
-          animate={{ 
+          animate={{
             x: [0, 100, 0],
             y: [0, -50, 0],
             rotate: [0, 180, 360]
           }}
-          transition={{ 
+          transition={{
             duration: 20,
             repeat: Infinity,
             ease: "linear"
@@ -71,12 +71,12 @@ const LoginPage = () => {
           }}
         />
         <motion.div
-          animate={{ 
+          animate={{
             x: [0, -80, 0],
             y: [0, 60, 0],
             rotate: [360, 180, 0]
           }}
-          transition={{ 
+          transition={{
             duration: 25,
             repeat: Infinity,
             ease: "linear"
@@ -105,7 +105,7 @@ const LoginPage = () => {
               </span>
             </h1>
             <p className="text-xl text-white/80 leading-relaxed">
-              Experience next-generation technology with NovaFuze-Tech. 
+              Experience next-generation technology with NovaFuze-Tech.
               Join thousands of users who trust our platform.
             </p>
           </motion.div>
@@ -126,7 +126,7 @@ const LoginPage = () => {
                   border: '1px solid rgba(255,255,255,0.2)'
                 }}
               >
-                <div 
+                <div
                   className="p-3 rounded-xl"
                   style={{ backgroundColor: features[currentFeature].color + '20' }}
                 >
@@ -175,8 +175,8 @@ const LoginPage = () => {
           className="w-full lg:w-1/2 max-w-md"
         >
           <motion.div variants={itemVariants}>
-            <Card className="shadow-2xl border border-primary/20" style={{ 
-              borderRadius: 24, 
+            <Card className="shadow-2xl border border-primary/20" style={{
+              borderRadius: 24,
               overflow: 'hidden',
               background: 'rgba(255,255,255,0.95)',
               backdropFilter: 'blur(20px)'
@@ -189,19 +189,19 @@ const LoginPage = () => {
                 <motion.div
                   initial={{ scale: 0, rotate: -180 }}
                   animate={{ scale: 1, rotate: 0 }}
-                  transition={{ 
-                    type: 'spring', 
-                    stiffness: 200, 
+                  transition={{
+                    type: 'spring',
+                    stiffness: 200,
                     damping: 15,
                     delay: 0.2
                   }}
                 >
                   <div className="relative">
-                    <img 
-                      src={novaFuzeLogo} 
-                      alt="NovaFuze-Tech Logo" 
-                      className="mx-auto mb-3" 
-                      style={{ width: 64, height: 64 }} 
+                    <img
+                      src={novaFuzeLogo}
+                      alt="NovaFuze-Tech Logo"
+                      className="mx-auto mb-3"
+                      style={{ width: 64, height: 64 }}
                     />
                     <motion.div
                       animate={{ rotate: 360 }}
@@ -222,12 +222,12 @@ const LoginPage = () => {
                   Sign in to access our platform
                 </CardDescription>
                 {!auth && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.5 }}
                     className="mt-2 p-2 rounded-lg text-xs"
-                    style={{ 
+                    style={{
                       backgroundColor: '#fef3c7',
                       color: '#d97706',
                       border: '1px solid #fbbf24'
@@ -239,24 +239,24 @@ const LoginPage = () => {
               </CardHeader>
               <CardContent className="pt-3 px-6 pb-6">
                 <Tabs value={activeTab} onValueChange={(k: string) => setActiveTab(k || 'email')} className="w-full">
-                  <TabsList className="grid grid-cols-2 rounded-xl p-1 mb-6" style={{ 
+                  <TabsList className="grid grid-cols-2 rounded-xl p-1 mb-6" style={{
                     background: 'rgba(99,102,241,0.10)',
                     border: '1px solid rgba(99,102,241,0.2)'
                   }}>
-                    <TabsTrigger 
-                      value="email" 
+                    <TabsTrigger
+                      value="email"
                       className="rounded-lg transition-all duration-200 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-fuchsia-500 data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
                     >
                       Email
                     </TabsTrigger>
-                    <TabsTrigger 
-                      value="phone" 
+                    <TabsTrigger
+                      value="phone"
                       className="rounded-lg transition-all duration-200 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-fuchsia-500 data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg"
                     >
                       Phone
                     </TabsTrigger>
                   </TabsList>
-                  
+
                   <AnimatePresence mode="wait">
                     <TabsContent value="email" className="pt-0">
                       <motion.div
@@ -282,13 +282,13 @@ const LoginPage = () => {
                     </TabsContent>
                   </AnimatePresence>
                 </Tabs>
-                
+
                 <div className="text-center mt-6">
                   <div className="relative my-6">
                     <hr style={{ border: '1px solid rgba(0,0,0,0.1)' }} />
-                    <span 
+                    <span
                       className="absolute left-1/2 -translate-x-1/2 px-4 text-xs text-muted-foreground"
-                      style={{ 
+                      style={{
                         top: '-10px',
                         backgroundColor: 'rgba(255,255,255,0.95)'
                       }}
