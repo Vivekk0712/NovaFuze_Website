@@ -10,11 +10,15 @@ import { motion } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, Loader2, UserPlus, LogIn } from 'lucide-react';
 import PasswordStrength from '../ui/PasswordStrength';
 
-const EmailAuth = () => {
+interface EmailAuthProps {
+  initialMode?: 'signin' | 'signup';
+}
+
+const EmailAuth = ({ initialMode = 'signup' }: EmailAuthProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [isSignUp, setIsSignUp] = useState(true);
+  const [isSignUp, setIsSignUp] = useState(initialMode === 'signup');
   const [isEmailFocused, setIsEmailFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [showPassword, setShowPassword] = useState(false);

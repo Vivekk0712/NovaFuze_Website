@@ -10,8 +10,30 @@ import { auth } from '../firebaseClient';
 import { Shield, Zap, Users, Star } from 'lucide-react';
 
 const LoginPage = () => {
+  // Check URL hash for mode: #login or #signup
+  const getInitialMode = () => {
+    const hash = window.location.hash;
+    return hash === '#signup' ? 'signup' : 'signin';
+  };
+
+  const [authMode, setAuthMode] = useState<'signin' | 'signup'>(getInitialMode());
   const [activeTab, setActiveTab] = useState('email');
   const [currentFeature, setCurrentFeature] = useState(0);
+
+  // Listen for hash changes to update mode
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      if (hash === '#signup') {
+        setAuthMode('signup');
+      } else if (hash === '#login') {
+        setAuthMode('signin');
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   const features = [
     { icon: Shield, text: "Secure & Private", color: "#10b981" },
@@ -266,7 +288,7 @@ const LoginPage = () => {
                         exit={{ opacity: 0, x: 20 }}
                         transition={{ duration: 0.3 }}
                       >
-                        <EmailAuth />
+                        <EmailAuth initialMode={authMode} />
                       </motion.div>
                     </TabsContent>
                     <TabsContent value="phone" className="pt-0">

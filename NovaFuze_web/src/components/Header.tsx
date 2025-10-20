@@ -74,17 +74,36 @@ export function Header() {
           <div className="hidden md:flex items-center space-x-3">
             <ThemeToggle />
 
-            <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold" asChild>
-              <a href={headerData.buttons.contact.href}>{headerData.buttons.contact.text}</a>
-            </Button>
-            <Button 
-              size="sm" 
-              className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-6 py-2 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105" 
-              asChild
-            >
-              <a href={headerData.buttons.cta.href}>{headerData.buttons.cta.text}</a>
-            </Button>
-            {user && <ProfileDropdown user={user} onSignOut={signOut} />}
+            {user ? (
+              // Logged in: Show Contact, Get Started, and Profile
+              <>
+                <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold" asChild>
+                  <a href={headerData.buttons.contact.href}>{headerData.buttons.contact.text}</a>
+                </Button>
+                <Button 
+                  size="sm" 
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-6 py-2 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105" 
+                  asChild
+                >
+                  <a href={headerData.buttons.cta.href}>{headerData.buttons.cta.text}</a>
+                </Button>
+                <ProfileDropdown user={user} onSignOut={signOut} />
+              </>
+            ) : (
+              // Not logged in: Show Sign In / Sign Up
+              <>
+                <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold" asChild>
+                  <a href="#login">Sign In</a>
+                </Button>
+                <Button 
+                  size="sm" 
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-6 py-2 shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105" 
+                  asChild
+                >
+                  <a href="#signup">Sign Up</a>
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu */}
@@ -117,16 +136,36 @@ export function Header() {
                     <span className="text-xs text-muted-foreground">Theme</span>
                     <ThemeToggle />
                   </div>
-                  <Button variant="outline" size="sm" asChild>
-                    <a href={headerData.buttons.contact.href}>{headerData.buttons.contact.text}</a>
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    style={{ backgroundColor: headerData.buttons.cta.bgColor }}
-                    asChild
-                  >
-                    <a href={headerData.buttons.cta.href}>{headerData.buttons.cta.text}</a>
-                  </Button>
+                  
+                  {user ? (
+                    // Logged in: Show Contact and Get Started
+                    <>
+                      <Button variant="outline" size="sm" asChild>
+                        <a href={headerData.buttons.contact.href}>{headerData.buttons.contact.text}</a>
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        style={{ backgroundColor: headerData.buttons.cta.bgColor }}
+                        asChild
+                      >
+                        <a href={headerData.buttons.cta.href}>{headerData.buttons.cta.text}</a>
+                      </Button>
+                    </>
+                  ) : (
+                    // Not logged in: Show Sign In / Sign Up
+                    <>
+                      <Button variant="outline" size="sm" asChild>
+                        <a href="#login">Sign In</a>
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        style={{ backgroundColor: headerData.buttons.cta.bgColor }}
+                        asChild
+                      >
+                        <a href="#signup">Sign Up</a>
+                      </Button>
+                    </>
+                  )}
                 </div>
               </div>
             </SheetContent>

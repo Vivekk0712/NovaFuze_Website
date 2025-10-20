@@ -25,27 +25,44 @@ const MCPToggle = ({ user }: MCPToggleProps) => {
     setIsFullscreen(!isFullscreen);
   };
 
+  const handleToggle = () => {
+    if (!user) {
+      // Not logged in - redirect to login
+      window.location.hash = '#login';
+      return;
+    }
+    // Logged in - toggle chat
+    setIsOpen((v) => !v);
+  };
+
   return (
     <>
-      {/* MCP Toggle Button */}
+      {/* MCP Toggle Button - Always visible */}
       <div className="fixed bottom-24 right-6" style={{ zIndex: 9999, pointerEvents: 'auto' }}>
         <Button
-          onClick={() => setIsOpen((v) => !v)}
-          className="w-14 h-14 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110"
+          onClick={handleToggle}
+          className="w-14 h-14 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110 relative"
           size="sm"
           style={{ backgroundColor: '#7c3aed', color: '#ffffff', opacity: 1 }}
+          title={user ? "Open AI Assistant" : "Sign in to use AI Assistant"}
         >
           {isOpen ? (
             <X className="h-6 w-6" />
           ) : (
             <MessageCircle className="h-6 w-6" />
           )}
+          {/* Lock indicator when not logged in */}
+          {!user && (
+            <div className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+              🔒
+            </div>
+          )}
         </Button>
       </div>
 
-      {/* MCP Chat Panel */}
+      {/* MCP Chat Panel - Only show when logged in and open */}
       <AnimatePresence>
-        {isOpen && (
+        {isOpen && user && (
           <motion.div
             className="fixed right-6"
             style={{

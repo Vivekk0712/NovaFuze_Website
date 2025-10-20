@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { usePageTransition, getTransitionForRoute } from "../hooks/usePageTransition"
 
 // Homepage components - load immediately for faster initial render
 import { HeroSection } from "./HeroSection"
@@ -27,6 +29,8 @@ import { RefundPolicyPage } from "./RefundPolicyPage"
 import AdminPage from "../pages/AdminPage"
 import PaymentPage from "./PaymentPage"
 import ProfilePage from "./ProfilePage"
+import LoginPage from "../pages/LoginPage"
+import { useAuth } from "../hooks/useAuth"
 
 export type Route = 
   | "home" 
@@ -41,6 +45,8 @@ export type Route =
   | "admin"
   | "payment"
   | "profile"
+  | "login"
+  | "signup"
   // Service detail pages
   | "services/web-development"
   | "services/mobile-development"
@@ -63,12 +69,19 @@ interface RouterProps {
   onRouteChange?: (route: Route) => void
 }
 
+// Protected routes that require authentication
+const PROTECTED_ROUTES: Route[] = ["admin", "payment", "profile"];
+
 export function Router({ onRouteChange }: RouterProps) {
   const [currentRoute, setCurrentRoute] = useState<Route>("home")
+  const { user } = useAuth()
 
   const handleRouteChange = useCallback((newRoute: Route) => {
     setCurrentRoute(newRoute)
     onRouteChange?.(newRoute)
+    
+    // Smooth scroll to top on route change
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [onRouteChange])
 
   useEffect(() => {
@@ -92,6 +105,10 @@ export function Router({ onRouteChange }: RouterProps) {
   }, [handleRouteChange])
 
   const renderPage = () => {
+    // Check if route requires authentication
+    if (PROTECTED_ROUTES.includes(currentRoute) && !user) {
+      return <LoginPage />
+    }
 
     switch (currentRoute) {
       case "home":
@@ -151,6 +168,12 @@ export function Router({ onRouteChange }: RouterProps) {
       case "profile":
         return <ProfilePage />
       
+      case "login":
+        return <LoginPage />
+      
+      case "signup":
+        return <LoginPage />
+      
       // Legal pages
       case "legal/privacy":
         return <PrivacyPolicyPage />
@@ -198,7 +221,23 @@ export function Router({ onRouteChange }: RouterProps) {
     }
   }
 
-  return renderPage()
+  // Get dynamic transition based on route
+  const transitionType = getTransitionForRoute(currentRoute);
+  const pageVariants = usePageTransition({ type: transitionType, duration: 0.4 });
+
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={currentRoute}
+        variants={pageVariants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+      >
+        {renderPage()}
+      </motion.div>
+    </AnimatePresence>
+  )
 }
 
 // Navigation helper function

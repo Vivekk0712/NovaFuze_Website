@@ -10,6 +10,7 @@ import {
   Instagram,
   ArrowUp
 } from "lucide-react"
+import novaFuzeLogo from '../assets/b8120387b6ec249e0e1c5e71a9f6e337f9f42039.png';
 
 export function Footer() {
   const services = [
@@ -56,8 +57,8 @@ export function Footer() {
           {/* Company Info */}
           <div className="lg:col-span-2">
             <div className="flex items-center space-x-2 mb-6">
-              <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
-                <span className="font-bold text-primary-foreground text-sm">N</span>
+              <div className="h-8 w-8 flex items-center justify-center">
+                <img src={novaFuzeLogo} alt="NovaFuze-Tech Logo" className="h-8 w-8 object-contain" />
               </div>
               <span className="font-semibold text-xl">NovaFuze-Tech</span>
             </div>
