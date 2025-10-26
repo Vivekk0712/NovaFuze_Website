@@ -36,14 +36,15 @@ security = HTTPBearer()
 @app.on_event("startup")
 async def startup_event():
     init_supabase(settings.SUPABASE_URL, settings.SUPABASE_SERVICE_ROLE_KEY)
-    # Load UI awareness from frontend
+    # Load UI awareness from frontend (optional - frontend may not be on same server)
     try:
         site_tools.load_site_facts()
         site_tools.load_structural_awareness()
         site_tools.load_functional_awareness()
-        logger.info("UI awareness loaded successfully")
+        logger.info("UI awareness loaded successfully from frontend files")
     except Exception as e:
-        logger.warning(f"Could not load UI awareness: {e}")
+        logger.info(f"Frontend files not available (expected in production): {e}")
+        logger.info("Using comprehensive knowledge base instead")
 
 class ChatRequest(BaseModel):
     user_id: str
@@ -99,11 +100,23 @@ async def mcp_query(request: ChatRequest):
         file_context = file_tools.search_similar_chunks(user_message, user_id, limit=50)
         logger.info(f"Found {len(file_context)} relevant file chunks")
 
-        # 3.5 Add UI awareness as context (structural + functional + contact)
-        ui_context = site_tools.get_ui_context()
+        # 3.5 Add UI awareness as context (knowledge base + optional frontend scanning)
+        from novafuze_knowledge import get_website_knowledge
+        
         site_context = []
-        if ui_context:
-            site_context = [{ 'content': ui_context }]
+        
+        # Always include comprehensive website knowledge base
+        website_knowledge = get_website_knowledge()
+        if website_knowledge:
+            site_context.append({ 'content': website_knowledge })
+        
+        # Optionally add scanned UI context if available
+        try:
+            ui_context = site_tools.get_ui_context()
+            if ui_context:
+                site_context.append({ 'content': ui_context })
+        except Exception as e:
+            logger.debug(f"UI context not available: {e}")
 
         # 4. Generate response with user context, file context, and site facts
         logger.info("Generating AI response...")
