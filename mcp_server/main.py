@@ -145,7 +145,15 @@ async def mcp_history(user_id: str):
     logger.info(f"Fetching chat history for user {user_id}")
     try:
         chat_history = chat_tools.get_chat_history(user_id)
-        return chat_history
+        # Format messages for frontend: convert database format to chat format
+        formatted_history = []
+        for msg in chat_history:
+            formatted_history.append({
+                "role": msg.get("role", "user"),
+                "content": msg.get("content", ""),
+                "timestamp": msg.get("created_at", "")
+            })
+        return {"history": formatted_history}
     except Exception as e:
         logger.error(f"Error fetching chat history for user {user_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")

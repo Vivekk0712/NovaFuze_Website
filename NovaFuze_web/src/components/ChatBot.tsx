@@ -26,22 +26,59 @@ const ChatBot = ({ user, onToggleFullscreen, isFullscreen = false }: ChatBotProp
   const [loading, setLoading] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
 
-  // Load chat history from localStorage (app-specific and user-specific)
+  // Load chat history from database when user logs in
   useEffect(() => {
-    if (user?.uid) {
-      const storageKey = `${APP_ID}_chatHistory_${user.uid}`;
-      const savedHistory = localStorage.getItem(storageKey);
-      console.log(`DEBUG: Loading from localStorage [${storageKey}]:`, savedHistory);
-      if (savedHistory) {
+    const loadChatHistory = async () => {
+      if (user?.uid) {
         try {
-          const parsedHistory = JSON.parse(savedHistory);
-          console.log('DEBUG: Parsed localStorage history:', parsedHistory);
-          setChatHistory(parsedHistory);
+          setLoading(true);
+          console.log('Loading chat history from database for user:', user.uid);
+          const response = await getHistory();
+          
+          if (response.data && response.data.history && Array.isArray(response.data.history)) {
+            const dbHistory = response.data.history;
+            console.log('Loaded chat history from database:', dbHistory);
+            setChatHistory(dbHistory);
+            
+            // Also sync to localStorage for offline access
+            const storageKey = `${APP_ID}_chatHistory_${user.uid}`;
+            localStorage.setItem(storageKey, JSON.stringify(dbHistory));
+          } else {
+            console.log('No chat history found in database, checking localStorage');
+            // Fallback to localStorage if database is empty
+            const storageKey = `${APP_ID}_chatHistory_${user.uid}`;
+            const savedHistory = localStorage.getItem(storageKey);
+            if (savedHistory) {
+              try {
+                const parsedHistory = JSON.parse(savedHistory);
+                console.log('Loaded chat history from localStorage:', parsedHistory);
+                setChatHistory(parsedHistory);
+              } catch (error) {
+                console.error('Error parsing saved chat history:', error);
+              }
+            }
+          }
         } catch (error) {
-          console.error('Error parsing saved chat history:', error);
+          console.error('Error loading chat history from database:', error);
+          // Fallback to localStorage on error
+          const storageKey = `${APP_ID}_chatHistory_${user.uid}`;
+          const savedHistory = localStorage.getItem(storageKey);
+          if (savedHistory) {
+            try {
+              const parsedHistory = JSON.parse(savedHistory);
+              console.log('Loaded chat history from localStorage (fallback):', parsedHistory);
+              setChatHistory(parsedHistory);
+            } catch (error) {
+              console.error('Error parsing saved chat history:', error);
+            }
+          }
+        } finally {
+          setLoading(false);
         }
       }
-    }
+    };
+
+    loadChatHistory();
   }, [user?.uid]);
 
   // Save chat history to localStorage whenever it changes
