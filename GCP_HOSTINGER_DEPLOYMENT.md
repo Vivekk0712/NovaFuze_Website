@@ -233,33 +233,24 @@ Add (copy from your local `backend/.env` and update for production):
 ```env
 # Server Configuration
 PORT=3000
-NODE_ENV=production
-
-# Firebase Configuration
-FIREBASE_PROJECT_ID=ridehailingapp-5eeec
+FIREBASE_PROJECT_ID=your-project-id
 GOOGLE_APPLICATION_CREDENTIALS=./serviceAccount.json
-
-# Session Configuration
 SESSION_COOKIE_NAME=__session
-SESSION_EXPIRES_IN=432000000
-
-# MCP Server URL (internal - same server)
+SESSION_EXPIRES_IN=432000000   # 5 days in ms
 MCP_SERVER_URL=http://localhost:8000
+NODE_ENV=production
+SUPABASE_URL=
+SUPABASE_SERVICE_ROLE_KEY=
 
-# Supabase Configuration
-SUPABASE_URL=https://lcdsysezautmobgkjbrs.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxjZHN5c2V6YXV0bW9iZ2tqYnJzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTkyMTU4NywiZXhwIjoyMDc1NDk3NTg3fQ.qSlFikshC5o7vwRh07TjIp4uG3zURS3YeN0pXDp77oA
-
-# Razorpay Configuration (LIVE keys - already live!)
-RAZORPAY_KEY_ID=rzp_live_RTiyMFXJwtSzDD
-RAZORPAY_KEY_SECRET=d0vSK8XDYl02qGd4cMCub4KJ
+RAZORPAY_KEY_ID=your_razorpay_key_id_here
+RAZORPAY_KEY_SECRET=your_razorpay_key_secret_here
 
 # Email Configuration
 EMAIL_SERVICE=gmail
-EMAIL_USER=narutouzumakixyz00@gmail.com
-EMAIL_PASS=kwns pexi dxsn shcp
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_app_password
 EMAIL_FROM_NAME=NovaFuze-Tech
-EMAIL_FROM_ADDRESS=narutouzumakixyz00@gmail.com
+EMAIL_FROM_ADDRESS=your_email@gmail.com
 ```
 
 Save: `Ctrl + X`, `Y`, `Enter`
@@ -326,15 +317,11 @@ nano .env
 
 Add (copy from your local `mcp_server/.env`):
 ```env
-# Supabase Configuration
-SUPABASE_URL=https://lcdsysezautmobgkjbrs.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxjZHN5c2V6YXV0bW9iZ2tqYnJzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1OTkyMTU4NywiZXhwIjoyMDc1NDk3NTg3fQ.qSlFikshC5o7vwRh07TjIp4uG3zURS3YeN0pXDp77oA
+SUPABASE_URL=
+SUPABASE_SERVICE_ROLE_KEY=
+GEMINI_API_KEY=
+JWT_SECRET_KEY=
 
-# Google Gemini API (for AI responses)
-GEMINI_API_KEY=AIzaSyCDW3tUBVpm2kr5jgCpHChCruZAbHpnKds
-
-# JWT Secret
-JWT_SECRET_KEY=my_auth_server_secret_key
 ```
 
 Save: `Ctrl + X`, `Y`, `Enter`
