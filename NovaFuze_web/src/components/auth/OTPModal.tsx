@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { sessionLogin } from '../../services/authApi';
-import { Modal, Form, Button, Alert } from 'react-bootstrap';
-import { motion } from 'framer-motion';
-
-import { Shield, Clock, RefreshCw, CheckCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { X, Shield, Clock, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
 
 interface OTPModalProps {
   show: boolean;
@@ -13,7 +11,7 @@ interface OTPModalProps {
 }
 
 const OTPModal = ({ show, onHide, confirmationResult, phoneNumber }: OTPModalProps) => {
-  const [otp, setOtp] = useState('');
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [error, setError] = useState<string | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [countdown, setCountdown] = useState(60);
@@ -31,7 +29,8 @@ const OTPModal = ({ show, onHide, confirmationResult, phoneNumber }: OTPModalPro
   const handleVerify = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
-    if (otp.length !== 6) {
+    const otpString = otp.join('');
+    if (otpString.length !== 6) {
       setError('Please enter the complete 6-digit code');
       return;
     }
@@ -40,18 +39,16 @@ const OTPModal = ({ show, onHide, confirmationResult, phoneNumber }: OTPModalPro
     setIsVerifying(true);
 
     try {
-      const userCredential = await confirmationResult.confirm(otp);
+      const userCredential = await confirmationResult.confirm(otpString);
       const idToken = await userCredential.user.getIdToken();
       await sessionLogin(idToken);
 
       // Success - close modal and redirect
       onHide();
-      window.location.hash = '#home';
-      window.location.reload();
+      window.location.href = window.location.origin;
     } catch (error: any) {
       console.error('OTP verification error:', error);
 
-      // Better error messages
       if (error.code === 'auth/invalid-verification-code') {
         setError('Invalid verification code. Please check and try again.');
       } else if (error.code === 'auth/code-expired') {
@@ -64,12 +61,49 @@ const OTPModal = ({ show, onHide, confirmationResult, phoneNumber }: OTPModalPro
     }
   };
 
+  const handleOtpChange = (index: number, value: string) => {
+    if (!/^\d*$/.test(value)) return; // Only allow digits
+
+    const newOtp = [...otp];
+    newOtp[index] = value.slice(-1); // Only take last character
+    setOtp(newOtp);
+
+    // Auto-focus next input
+    if (value && index < 5) {
+      const nextInput = document.getElementById(`otp-${index + 1}`);
+      nextInput?.focus();
+    }
+
+    // Auto-submit when all 6 digits are entered
+    if (index === 5 && value && newOtp.every(digit => digit !== '')) {
+      setTimeout(() => handleVerify(), 100);
+    }
+  };
+
+  const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
+    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+      const prevInput = document.getElementById(`otp-${index - 1}`);
+      prevInput?.focus();
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+    const newOtp = pastedData.split('').concat(Array(6).fill('')).slice(0, 6);
+    setOtp(newOtp);
+
+    // Focus last filled input or first empty
+    const lastIndex = Math.min(pastedData.length, 5);
+    const targetInput = document.getElementById(`otp-${lastIndex}`);
+    targetInput?.focus();
+  };
+
   const handleResendOTP = async () => {
     setCanResend(false);
     setCountdown(60);
     setError(null);
-    // In a real implementation, you'd trigger a new OTP send here
-    // For now, just reset the timer
+    setOtp(['', '', '', '', '', '']);
   };
 
   const formatPhoneNumber = (phone: string) => {
@@ -79,236 +113,138 @@ const OTPModal = ({ show, onHide, confirmationResult, phoneNumber }: OTPModalPro
     return phone;
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: { opacity: 1, y: 0 }
-  };
+  if (!show) return null;
 
   return (
-    <Modal
-      show={show}
-      onHide={onHide}
-      centered
-      backdrop="static"
-      keyboard={false}
-      contentClassName="border-0"
-      style={{ zIndex: 1060 }}
-    >
-      <div style={{
-        borderRadius: 20,
-        overflow: 'hidden',
-        boxShadow: '0 25px 50px rgba(0,0,0,0.25)'
-      }}>
-        <Modal.Header
-          closeButton
-          className="border-0 pb-2"
-          style={{
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            color: 'white'
-          }}
-        >
-          <Modal.Title className="d-flex align-items-center">
-            <Shield className="me-2" size={20} />
-            Verify Your Phone
-          </Modal.Title>
-        </Modal.Header>
-
-        <Modal.Body className="px-4 py-4" style={{ backgroundColor: '#fff' }}>
+    <AnimatePresence>
+      {show && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
           <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={{
-              visible: {
-                transition: {
-                  staggerChildren: 0.1
-                }
-              }
-            }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden"
           >
-            {/* Header Info */}
-            <motion.div variants={itemVariants} className="text-center mb-4">
-              <p className="mb-2 text-muted">
-                We've sent a 6-digit verification code to
+            {/* Header */}
+            <div className="bg-gradient-to-br from-[#6B73FF] to-[#4E6BDF] p-6 relative">
+              <button
+                onClick={onHide}
+                className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors"
+              >
+                <X className="h-6 w-6" />
+              </button>
+              
+              <div className="flex items-center justify-center mb-2">
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                  <Shield className="h-6 w-6 text-white" />
+                </div>
+              </div>
+              
+              <h2 className="text-2xl font-bold text-white text-center mb-2">
+                Verify Your Phone
+              </h2>
+              <p className="text-white/90 text-sm text-center">
+                We've sent a 6-digit code to
               </p>
-              <p className="fw-bold text-primary mb-0">
+              <p className="text-white font-semibold text-center mt-1">
                 {formatPhoneNumber(phoneNumber)}
               </p>
-            </motion.div>
+            </div>
 
-            <Form onSubmit={handleVerify}>
-              <motion.div variants={itemVariants}>
-                <Form.Group className="mb-4" controlId="formBasicOtp">
-                  <Form.Label className="small fw-semibold text-muted mb-3 d-block text-center">
+            {/* Body */}
+            <div className="p-8">
+              <form onSubmit={handleVerify}>
+                {/* OTP Input */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 text-center mb-4">
                     Enter Verification Code
-                  </Form.Label>
-
-                  {/* Modern OTP Input */}
-                  <div className="d-flex justify-content-center mb-3">
-                    <div className="d-flex gap-2">
-                      {[0, 1, 2, 3, 4, 5].map((index) => (
-                        <input
-                          key={index}
-                          type="text"
-                          maxLength={1}
-                          className="text-center"
-                          style={{
-                            width: '45px',
-                            height: '50px',
-                            border: '2px solid #e5e7eb',
-                            borderRadius: '12px',
-                            fontSize: '20px',
-                            fontWeight: 'bold',
-                            outline: 'none',
-                            transition: 'all 200ms ease'
-                          }}
-                          value={otp[index] || ''}
-                          onChange={(e) => {
-                            const newOtp = otp.split('');
-                            newOtp[index] = e.target.value;
-                            setOtp(newOtp.join(''));
-
-                            // Auto-focus next input
-                            if (e.target.value && index < 5) {
-                              const target = e.target as HTMLInputElement;
-                              const nextInput = target.parentElement?.children[index + 1] as HTMLInputElement;
-                              nextInput?.focus();
-                            }
-                          }}
-                          onKeyDown={(e) => {
-                            // Handle backspace
-                            if (e.key === 'Backspace' && !otp[index] && index > 0) {
-                              const target = e.target as HTMLInputElement;
-                              const prevInput = target.parentElement?.children[index - 1] as HTMLInputElement;
-                              prevInput?.focus();
-                            }
-                            // Handle Enter key to submit
-                            if (e.key === 'Enter' && otp.length === 6) {
-                              handleVerify();
-                            }
-                            // Handle paste
-                            if (e.key === 'v' && (e.ctrlKey || e.metaKey)) {
-                              e.preventDefault();
-                              navigator.clipboard.readText().then((text) => {
-                                const pastedOtp = text.replace(/\D/g, '').slice(0, 6);
-                                setOtp(pastedOtp);
-                              });
-                            }
-                          }}
-                          onFocus={(e) => {
-                            e.target.style.borderColor = '#6366f1';
-                            e.target.style.boxShadow = '0 0 0 3px rgba(99,102,241,0.15)';
-                          }}
-                          onBlur={(e) => {
-                            e.target.style.borderColor = '#e5e7eb';
-                            e.target.style.boxShadow = 'none';
-                          }}
-                        />
-                      ))}
-                    </div>
+                  </label>
+                  
+                  <div className="flex justify-center gap-2 mb-4" onPaste={handlePaste}>
+                    {otp.map((digit, index) => (
+                      <input
+                        key={index}
+                        id={`otp-${index}`}
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={1}
+                        value={digit}
+                        onChange={(e) => handleOtpChange(index, e.target.value)}
+                        onKeyDown={(e) => handleKeyDown(index, e)}
+                        className="w-12 h-14 text-center text-2xl font-bold border-2 border-gray-200 rounded-xl focus:border-[#4E6BDF] focus:ring-4 focus:ring-[#4E6BDF]/20 outline-none transition-all"
+                        disabled={isVerifying}
+                      />
+                    ))}
                   </div>
-                </Form.Group>
-              </motion.div>
+                </div>
 
-              {error && (
-                <motion.div variants={itemVariants}>
-                  <Alert
-                    variant="danger"
-                    className="d-flex align-items-center text-center"
-                    style={{
-                      borderRadius: 12,
-                      border: 'none',
-                      backgroundColor: '#fef2f2',
-                      color: '#dc2626',
-                      fontSize: '14px'
-                    }}
+                {/* Error Message */}
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2"
                   >
-                    {error}
-                  </Alert>
-                </motion.div>
-              )}
+                    <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-red-600">{error}</p>
+                  </motion.div>
+                )}
 
-              <motion.div variants={itemVariants} className="d-grid gap-2">
-                <motion.button
-                  whileHover={{ scale: isVerifying ? 1 : 1.02 }}
-                  whileTap={{ scale: isVerifying ? 1 : 0.98 }}
+                {/* Verify Button */}
+                <button
                   type="submit"
-                  disabled={isVerifying || otp.length !== 6}
-                  className="btn"
-                  style={{
-                    background: isVerifying || otp.length !== 6
-                      ? 'linear-gradient(90deg, #9ca3af, #9ca3af)'
-                      : 'linear-gradient(90deg, #10b981, #059669)',
-                    color: '#ffffff',
-                    border: 'none',
-                    borderRadius: 12,
-                    padding: '12px 16px',
-                    boxShadow: isVerifying || otp.length !== 6
-                      ? 'none'
-                      : '0 10px 24px rgba(16,185,129,0.35)',
-                    transition: 'all 200ms ease',
-                    fontSize: '16px',
-                    fontWeight: '600',
-                    cursor: isVerifying || otp.length !== 6 ? 'not-allowed' : 'pointer'
-                  }}
+                  disabled={isVerifying || otp.some(digit => !digit)}
+                  className="w-full h-12 bg-gradient-to-r from-[#6B73FF] to-[#4E6BDF] hover:from-[#5A64F5] hover:to-[#3D51D3] text-white rounded-xl font-semibold text-base shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {isVerifying ? (
-                    <div className="d-flex align-items-center justify-content-center">
-                      <div className="spinner-border spinner-border-sm me-2" role="status">
-                        <span className="visually-hidden">Loading...</span>
-                      </div>
+                    <>
+                      <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
                       Verifying...
-                    </div>
+                    </>
                   ) : (
-                    <div className="d-flex align-items-center justify-content-center">
-                      <CheckCircle size={18} className="me-2" />
+                    <>
+                      <CheckCircle className="h-5 w-5" />
                       Verify Code
-                    </div>
+                    </>
                   )}
-                </motion.button>
+                </button>
 
-                {/* Resend OTP */}
-                <div className="text-center mt-3">
+                {/* Resend Code */}
+                <div className="text-center mt-4">
                   {!canResend ? (
-                    <small className="text-muted d-flex align-items-center justify-content-center">
-                      <Clock size={14} className="me-1" />
-                      Resend code in {countdown}s
-                    </small>
+                    <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                      <Clock className="h-4 w-4" />
+                      <span>Resend code in {countdown}s</span>
+                    </div>
                   ) : (
-                    <Button
-                      variant="link"
-                      size="sm"
+                    <button
+                      type="button"
                       onClick={handleResendOTP}
-                      className="text-decoration-none p-0"
-                      style={{ color: '#6366f1' }}
+                      className="text-sm font-semibold text-[#4E6BDF] hover:text-[#3D51D3] transition-colors flex items-center justify-center gap-2 mx-auto"
                     >
-                      <RefreshCw size={14} className="me-1" />
+                      <RefreshCw className="h-4 w-4" />
                       Resend Code
-                    </Button>
+                    </button>
                   )}
                 </div>
-              </motion.div>
-            </Form>
+              </form>
 
-            {/* Security Info */}
-            <motion.div variants={itemVariants} className="mt-4">
-              <div
-                className="d-flex align-items-center justify-content-center p-3 text-center"
-                style={{
-                  backgroundColor: '#f0f9ff',
-                  borderRadius: 12,
-                  border: '1px solid #e0f2fe'
-                }}
-              >
-                <Shield size={16} className="me-2 text-primary" />
-                <small className="text-muted mb-0">
+              {/* Security Info */}
+              <div className="mt-6 p-3 bg-blue-50 border border-blue-100 rounded-xl flex items-center gap-2">
+                <Shield className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                <p className="text-xs text-blue-600">
                   Your phone number is secure and will not be shared
-                </small>
+                </p>
               </div>
-            </motion.div>
+            </div>
           </motion.div>
-        </Modal.Body>
-      </div>
-    </Modal>
+        </div>
+      )}
+    </AnimatePresence>
   );
 };
 

@@ -30,6 +30,7 @@ import AdminPage from "../pages/AdminPage"
 import PaymentPage from "./PaymentPage"
 import ProfilePage from "./ProfilePage"
 import LoginPage from "../pages/LoginPage"
+import PhoneLoginPage from "../pages/PhoneLoginPage"
 import { useAuth } from "../hooks/useAuth"
 
 export type Route = 
@@ -46,6 +47,7 @@ export type Route =
   | "payment"
   | "profile"
   | "login"
+  | "login-phone"
   | "signup"
   // Service detail pages
   | "services/web-development"
@@ -170,6 +172,9 @@ export function Router({ onRouteChange }: RouterProps) {
       
       case "login":
         return <LoginPage />
+      
+      case "login-phone":
+        return <PhoneLoginPage />
       
       case "signup":
         return <LoginPage />
