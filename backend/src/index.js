@@ -10,8 +10,8 @@ const port = process.env.PORT || 4000;
 
 const corsOptions = {
   origin: [
-    'https://aidrip.in',                 // Production frontend (YOUR DOMAIN!)
-    'https://www.aidrip.in',             // WWW version
+    'https://novafuze.in',                 // Production frontend (YOUR DOMAIN!)
+    'https://www.novafuze.in',             // WWW version
     'https://fire-auth-mcp.netlify.app', // Old production frontend
     'http://localhost:5173',             // Local testing
     'http://localhost:5174',             // NovaFuze local testing
