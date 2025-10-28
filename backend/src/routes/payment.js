@@ -73,9 +73,17 @@ router.post('/create-order', verifySession, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error creating Razorpay order:', error);
+    console.error('Error creating Razorpay order:', {
+      statusCode: error.statusCode,
+      error: error.error
+    });
     res.status(500).json({ 
-      error: { code: 'ORDER_CREATION_FAILED', message: 'Failed to create payment order' } 
+      success: false,
+      error: { 
+        code: 'ORDER_CREATION_FAILED', 
+        message: 'Failed to create payment order',
+        details: error.error || error.message
+      } 
     });
   }
 });

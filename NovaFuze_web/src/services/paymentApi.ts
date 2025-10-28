@@ -109,6 +109,16 @@ export const handleRazorpayPayment = (
   onSuccess: (response: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string }) => void,
   onError: (error: { message: string }) => void
 ) => {
+  const prefillData: any = {
+    name: userDetails.name || '',
+    email: userDetails.email || '',
+  };
+  
+  // Only add contact if provided
+  if (userDetails.contact) {
+    prefillData.contact = userDetails.contact;
+  }
+
   const options = {
     key: razorpayKey,
     amount: order.amount,
@@ -116,11 +126,7 @@ export const handleRazorpayPayment = (
     name: 'NovaFuze-Tech',
     description: `Purchase ${productName}`,
     order_id: order.id,
-    prefill: {
-      name: userDetails.name || '',
-      email: userDetails.email || '',
-      contact: userDetails.contact || '',
-    },
+    prefill: prefillData,
     theme: {
       color: '#7c3aed',
     },

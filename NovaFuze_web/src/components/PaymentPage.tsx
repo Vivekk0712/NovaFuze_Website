@@ -74,8 +74,7 @@ const PaymentPage = () => {
                 orderResponse.key,
                 {
                     name: purchaseStatus?.user?.displayName || user.displayName || user.email || '',
-                    email: purchaseStatus?.user?.email || user.email || '',
-                    contact: purchaseStatus?.user?.phoneNumber || user.providerData?.find(p => p.providerId === 'phone')?.phoneNumber || ''
+                    email: purchaseStatus?.user?.email || user.email || ''
                 },
                 productDetails.name,
                 async (response: any) => {
