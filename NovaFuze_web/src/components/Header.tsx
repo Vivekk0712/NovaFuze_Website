@@ -1,6 +1,7 @@
+import { useState } from "react"
 import { Button } from "./ui/button"
-import { Menu } from "lucide-react"
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "./ui/sheet"
+import { Menu, X } from "lucide-react"
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription, SheetClose } from "./ui/sheet"
 import { ThemeToggle } from "./ThemeToggle"
 import ProfileDropdown from "./ProfileDropdown"
 import { useAuth } from "../hooks/useAuth"
@@ -9,6 +10,7 @@ import novaFuzeLogo from '../assets/b8120387b6ec249e0e1c5e71a9f6e337f9f42039.png
 
 export function Header() {
   const { user, signOut } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
   
   const headerData = {
     logo: {
@@ -107,62 +109,100 @@ export function Header() {
           </div>
 
           {/* Mobile Menu */}
-          <Sheet>
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild className="md:hidden">
               <Button variant="ghost" size="sm" aria-label="Open navigation menu">
                 <Menu className="h-5 w-5" />
                 <span className="sr-only">Menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right">
-              <SheetHeader className="sr-only">
-                <SheetTitle>Navigation Menu</SheetTitle>
-                <SheetDescription>
-                  Navigate through NovaFuze-Tech website sections and get started with our services.
+            <SheetContent side="right" className="w-[300px] sm:w-[350px]">
+              <SheetHeader className="text-left mb-6">
+                <div className="flex items-center justify-between">
+                  <SheetTitle className="text-xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+                    Menu
+                  </SheetTitle>
+                  <SheetClose asChild>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </SheetClose>
+                </div>
+                <SheetDescription className="text-xs">
+                  Navigate through NovaFuze-Tech
                 </SheetDescription>
               </SheetHeader>
-              <div className="flex flex-col space-y-4 mt-8">
+              
+              <div className="flex flex-col space-y-1">
                 {navigation.map((item) => (
                   <a
                     key={item.name}
                     href={item.href}
-                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                    onClick={() => setIsOpen(false)}
+                    className="px-4 py-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded-lg transition-all duration-200 flex items-center justify-between group"
                   >
-                    {item.name}
+                    <span>{item.name}</span>
+                    <span className="text-primary opacity-0 group-hover:opacity-100 transition-opacity">→</span>
                   </a>
                 ))}
-                <div className="flex flex-col space-y-2 pt-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">Theme</span>
-                    <ThemeToggle />
-                  </div>
-                  
+                
+                <div className="border-t my-4"></div>
+                
+                <div className="flex items-center justify-between px-4 py-2">
+                  <span className="text-sm font-medium text-muted-foreground">Theme</span>
+                  <ThemeToggle />
+                </div>
+                
+                <div className="border-t my-4"></div>
+                
+                <div className="flex flex-col space-y-2 px-2">
                   {user ? (
-                    // Logged in: Show Contact and Get Started
+                    // Logged in: Show Contact, Get Started, and Profile
                     <>
-                      <Button variant="outline" size="sm" asChild>
-                        <a href={headerData.buttons.contact.href}>{headerData.buttons.contact.text}</a>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full justify-start"
+                        asChild
+                      >
+                        <a href={headerData.buttons.contact.href} onClick={() => setIsOpen(false)}>
+                          {headerData.buttons.contact.text}
+                        </a>
                       </Button>
                       <Button 
                         size="sm" 
-                        style={{ backgroundColor: headerData.buttons.cta.bgColor }}
+                        className="w-full justify-start bg-primary hover:bg-primary/90"
                         asChild
                       >
-                        <a href={headerData.buttons.cta.href}>{headerData.buttons.cta.text}</a>
+                        <a href={headerData.buttons.cta.href} onClick={() => setIsOpen(false)}>
+                          {headerData.buttons.cta.text}
+                        </a>
                       </Button>
+                      <div className="pt-2">
+                        <ProfileDropdown user={user} onSignOut={signOut} />
+                      </div>
                     </>
                   ) : (
                     // Not logged in: Show Sign In / Sign Up
                     <>
-                      <Button variant="outline" size="sm" asChild>
-                        <a href="#login">Sign In</a>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full justify-start"
+                        asChild
+                      >
+                        <a href="#login" onClick={() => setIsOpen(false)}>
+                          Sign In
+                        </a>
                       </Button>
                       <Button 
                         size="sm" 
-                        style={{ backgroundColor: headerData.buttons.cta.bgColor }}
+                        className="w-full justify-start bg-primary hover:bg-primary/90"
                         asChild
                       >
-                        <a href="#signup">Sign Up</a>
+                        <a href="#signup" onClick={() => setIsOpen(false)}>
+                          Sign Up
+                        </a>
                       </Button>
                     </>
                   )}
