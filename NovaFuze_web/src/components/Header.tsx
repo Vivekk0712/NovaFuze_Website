@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Button } from "./ui/button"
-import { Menu, X } from "lucide-react"
-import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription, SheetClose } from "./ui/sheet"
+import { Menu } from "lucide-react"
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle, SheetDescription } from "./ui/sheet"
 import { ThemeToggle } from "./ThemeToggle"
 import ProfileDropdown from "./ProfileDropdown"
 import { useAuth } from "../hooks/useAuth"
@@ -118,16 +118,9 @@ export function Header() {
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[350px]">
               <SheetHeader className="text-left mb-6">
-                <div className="flex items-center justify-between">
-                  <SheetTitle className="text-xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
-                    Menu
-                  </SheetTitle>
-                  <SheetClose asChild>
-                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </SheetClose>
-                </div>
+                <SheetTitle className="text-xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+                  Menu
+                </SheetTitle>
                 <SheetDescription className="text-xs">
                   Navigate through NovaFuze-Tech
                 </SheetDescription>
