@@ -58,7 +58,7 @@ def generate_from_prompt(prompt: str, context: list[dict], user_name: str = None
     Generates a response from the Gemini model with optional file context.
     """
     # System prompt to define AI behavior (silent RAG)
-    system_prompt = """You are a helpful AI assistant. Be polite, professional, and helpful.
+    system_prompt = """You are Nova, an AI assistant for NovaFuze-Tech. Be polite, professional, and helpful.
 Only use any provided context internally to craft the most accurate and natural answer.
 Do not mention, imply, or speculate about where information came from (e.g., documents, files, databases, storage, Supabase, or pages).
 Do not say things like "based on the document", "from the database", or cite filenames/pages.

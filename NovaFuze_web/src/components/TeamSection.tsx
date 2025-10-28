@@ -71,6 +71,63 @@ export function TeamSection() {
         "Led migration of legacy systems to modern cloud infrastructure",
         "Contributing author to open-source React libraries"
       ]
+    },
+    {
+      id: "vinayak",
+      name: "Vinayaka v",
+      role: "Developer",
+      shortBio: "Passionate developer focused on creating elegant solutions and building high-quality web applications.",
+      fullBio: "Vinayaka is a dedicated developer at NovaFuze-Tech with a keen eye for detail and a commitment to writing clean, maintainable code. He brings fresh perspectives to the team and continuously expands his skill set to stay current with emerging technologies. His collaborative approach and problem-solving abilities make him a valuable asset to every project.",
+      photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
+      skills: ["JavaScript", "React", "Node.js", "MongoDB", "REST APIs", "Git"],
+      socialLinks: {
+        linkedin: "https://www.linkedin.com/in/vinayak-novafuze",
+        email: "vinayaka@novafuze.in"
+      },
+      achievements: [
+        "Contributed to multiple client projects with exceptional code quality",
+        "Improved development workflows through automation",
+        "Quick learner adapting to new technologies rapidly",
+        "Strong team collaborator and code reviewer"
+      ]
+    },
+    {
+      id: "vivek",
+      name: "Vivek Kashyap",
+      role: "Developer",
+      shortBio: "Innovative developer with expertise in modern web technologies and a focus on user-centric design.",
+      fullBio: "Vivek brings creativity and technical expertise to the NovaFuze-Tech development team. With a strong foundation in modern web development practices, he excels at translating complex requirements into intuitive user interfaces. His attention to user experience and performance optimization ensures that every application he works on delivers exceptional value.",
+      photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
+      skills: ["React", "TypeScript", "CSS/SCSS", "UI/UX", "Responsive Design", "Git"],
+      socialLinks: {
+        linkedin: "https://www.linkedin.com/in/vivek-novafuze",
+        email: "vivek@novafuze.in"
+      },
+      achievements: [
+        "Developed responsive interfaces used by thousands of users",
+        "Optimized frontend performance resulting in faster load times",
+        "Collaborated on cross-functional teams for successful deliveries",
+        "Advocate for accessibility and inclusive design practices"
+      ]
+    },
+    {
+      id: "vishaka",
+      name: "Vishakha",
+      role: "Developer",
+      shortBio: "Detail-oriented developer skilled in building robust applications with a focus on code quality and best practices.",
+      fullBio: "Vishaka is a talented developer at NovaFuze-Tech who combines technical proficiency with a methodical approach to software development. Her commitment to following industry best practices and writing well-tested code ensures reliability across all projects. She brings valuable insights to the team and consistently delivers high-quality solutions.",
+      photo: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop",
+      skills: ["JavaScript", "React", "HTML/CSS", "Testing", "Debugging", "Agile Development"],
+      socialLinks: {
+        linkedin: "https://www.linkedin.com/in/vishaka-novafuze",
+        email: "vishaka@novafuze.in"
+      },
+      achievements: [
+        "Maintained high code quality standards across projects",
+        "Implemented comprehensive testing strategies",
+        "Contributed to documentation and knowledge sharing",
+        "Proactive in identifying and resolving technical issues"
+      ]
     }
   ]
 
@@ -97,13 +154,15 @@ export function TeamSection() {
           </p>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-8 max-w-4xl mx-auto">
-          {teamMembers.map((member) => (
-            <Card 
-              key={member.id}
-              className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 shadow-lg overflow-hidden bg-white cursor-pointer w-80"
-              onClick={() => handleMemberClick(member)}
-            >
+        <div className="max-w-6xl mx-auto">
+          {/* First Row - 2 Profiles */}
+          <div className="flex flex-wrap justify-center gap-8 mb-8">
+            {teamMembers.slice(0, 2).map((member) => (
+              <Card 
+                key={member.id}
+                className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 shadow-lg overflow-hidden bg-white cursor-pointer w-80"
+                onClick={() => handleMemberClick(member)}
+              >
               <CardContent className="p-6 text-center">
                 {/* Profile Photo */}
                 <div className="w-24 h-24 rounded-full overflow-hidden mx-auto mb-4 ring-4 ring-[#F1F4FD] group-hover:ring-[#4E6BDF] transition-all duration-300">
@@ -173,6 +232,83 @@ export function TeamSection() {
               </CardContent>
             </Card>
           ))}
+          </div>
+
+          {/* Second Row - 3 Profiles */}
+          <div className="flex flex-wrap justify-center gap-8">
+            {teamMembers.slice(2).map((member) => (
+              <Card 
+                key={member.id}
+                className="group hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-0 shadow-lg overflow-hidden bg-white cursor-pointer w-80"
+                onClick={() => handleMemberClick(member)}
+              >
+                <CardContent className="p-6 text-center">
+                  {/* Profile Photo */}
+                  <div className="w-24 h-24 rounded-full overflow-hidden mx-auto mb-4 ring-4 ring-[#F1F4FD] group-hover:ring-[#4E6BDF] transition-all duration-300">
+                    <ImageWithFallback
+                      src={member.photo}
+                      alt={member.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+
+                  {/* Name & Role */}
+                  <h3 className="text-lg font-semibold mb-1 group-hover:text-[#4E6BDF] transition-colors">
+                    {member.name}
+                  </h3>
+                  <p className="text-sm text-[#4E6BDF] font-medium mb-3">{member.role}</p>
+
+                  {/* Short Bio */}
+                  <p className="text-sm text-muted-foreground mb-4 leading-relaxed line-clamp-3">
+                    {member.shortBio}
+                  </p>
+
+                  {/* Social Links */}
+                  <div className="flex justify-center gap-2">
+                    {member.socialLinks.linkedin && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-8 h-8 p-0 hover:bg-[#4E6BDF] hover:text-white text-[#4E6BDF]"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          window.open(member.socialLinks.linkedin, '_blank')
+                        }}
+                      >
+                        <Linkedin className="h-4 w-4" />
+                      </Button>
+                    )}
+                    {member.socialLinks.github && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-8 h-8 p-0 hover:bg-[#4E6BDF] hover:text-white text-[#4E6BDF]"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          window.open(member.socialLinks.github, '_blank')
+                        }}
+                      >
+                        <Github className="h-4 w-4" />
+                      </Button>
+                    )}
+                    {member.socialLinks.twitter && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-8 h-8 p-0 hover:bg-[#4E6BDF] hover:text-white text-[#4E6BDF]"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          window.open(member.socialLinks.twitter, '_blank')
+                        }}
+                      >
+                        <Twitter className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
 
 

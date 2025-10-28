@@ -11,6 +11,8 @@ import {
   ArrowUp
 } from "lucide-react"
 import novaFuzeLogo from '../assets/b8120387b6ec249e0e1c5e71a9f6e337f9f42039.png';
+import startupKarnatakaLogo from '../assets/0bbb9de8f8fad1c4e576e83232da3465b13c1389.png'
+import dpiitStartupIndiaLogo from '../assets/b541470d22c77d565be497d99fa25a79dc5b8df5.png'
 
 export function Footer() {
   const services = [
@@ -173,6 +175,31 @@ export function Footer() {
               <ArrowUp className="h-4 w-4 mr-1" />
               Back to Top
             </Button>
+          </div>
+        </div>
+
+        <Separator className="my-8" />
+
+        {/* Government Recognition Section */}
+        <div className="mb-8">
+          <h4 className="text-sm font-semibold text-center mb-4 text-muted-foreground">
+            Recognized By Government of India & Karnataka
+          </h4>
+          <div className="flex flex-wrap justify-center items-center gap-8">
+            <div className="flex items-center justify-center">
+              <img 
+                src={dpiitStartupIndiaLogo} 
+                alt="DPIIT Startup India Recognition" 
+                className="h-12 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity"
+              />
+            </div>
+            <div className="flex items-center justify-center">
+              <img 
+                src={startupKarnatakaLogo} 
+                alt="Startup Karnataka Recognition" 
+                className="h-12 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity"
+              />
+            </div>
           </div>
         </div>
 

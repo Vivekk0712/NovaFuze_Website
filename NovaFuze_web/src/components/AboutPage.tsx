@@ -1,5 +1,6 @@
 import { AboutHeroSection } from "./AboutHeroSection"
 import { MissionVisionSection } from "./MissionVisionSection"
+import { GovernmentRecognitionSection } from "./GovernmentRecognitionSection"
 import { WhyChooseUsSection } from "./WhyChooseUsSection"
 import { TeamSection } from "./TeamSection"
 import { CompanyCultureSection } from "./CompanyCultureSection"
@@ -12,6 +13,7 @@ export function AboutPage() {
     <>
       <AboutHeroSection />
       <MissionVisionSection />
+      <GovernmentRecognitionSection />
       <WhyChooseUsSection />
       <TeamSection />
       <CompanyCultureSection />

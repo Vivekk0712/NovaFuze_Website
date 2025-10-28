@@ -12,6 +12,8 @@ WEBSITE_KNOWLEDGE = """
 - Tagline: "Innovative Digital Solutions"
 - Mission: Building modern digital experiences with AI-powered solutions
 - Vision: Transform ideas into scalable, innovative technology solutions that drive business growth
+- Government Recognition: DPIIT Certified Startup (Government of India recognized)
+- Certifications: Startup India certified, officially recognized by the Department for Promotion of Industry and Internal Trade
 
 ## Contact Information
 - Email: support@novafuze.in
@@ -571,29 +573,34 @@ Features:
 - Email confirmation sent automatically
 - Payment history (if logged in)
 
-### AI Chatbot Widget
+### AI Chatbot Widget (Nova AI)
 **Interface:**
-- Floating chat button (bottom-right)
-- Chat window with header
-- Message history with timestamps
-- User messages: Blue background, right-aligned
-- Assistant messages: White background, left-aligned
+- Floating chat button (bottom-right) with purple gradient
+- Compact chat window (360px wide, 540px tall)
+- Modern rounded design with smooth animations
+- Welcome message: "Hi! 👋 I'm Nova, your AI assistant. How can I help you today?"
+- Message history with tiny timestamps (7px font)
+- User messages: Solid blue (#4E6BDF) background, right-aligned
+- Assistant messages: White background with bot avatar, left-aligned
 - Input field with send button
-- Loading spinner during AI response
+- Animated typing indicators (3 bouncing dots)
 - Auto-scroll to latest message
 
 **Features:**
-- Clear chat history button (Trash icon)
-- Fullscreen mode toggle
-- Minimize/maximize
+- AI Name: Nova (aware of its identity as Nova AI assistant)
+- Clear chat history button with confirmation dialog
+- Quick action buttons: Services, Pricing, Contact, Portfolio
+- Contact options: Phone, Email, WhatsApp links
 - LocalStorage persistence per user
-- Character count
-- Typing indicators
+- Cross-device chat history sync via database
+- Smooth Framer Motion animations
+- Always visible, appears above header (z-index: 9999)
 
 **Header:**
-- "AI Assistant" title
-- Clear history button
-- Fullscreen toggle
+- "Nova AI" title with sparkle emoji (✨)
+- Online status indicator (green pulsing dot)
+- Bot avatar with purple gradient
+- Clear history button (Trash icon)
 - Close button (X)
 
 ## Recent Updates
@@ -606,6 +613,10 @@ Features:
 - Added comprehensive UI awareness to chatbot
 - Improved testimonials carousel with auto-play
 - Enhanced contact form with validation
+- Added Government Recognition Section (DPIIT Certified Startup badge)
+- Redesigned chatbot as "Nova AI" with modern compact UI
+- Implemented welcome message for new conversations
+- Added cross-device chat history synchronization
 - Updated team section with modal details
 
 ## UI Component Library
