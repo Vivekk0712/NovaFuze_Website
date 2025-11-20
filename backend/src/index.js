@@ -22,14 +22,16 @@ const allowedOrigins = [
 // Correct CORS configuration
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (Postman, server-to-server, curl)
+  console.log("Incoming Origin:", origin);
+  
     if (!origin) return callback(null, true);
 
     if (allowedOrigins.includes(origin)) {
+      console.log("✔ Allowed:", origin);
       callback(null, true);
     } else {
-      console.log('❌ Blocked by CORS:', origin);
-      callback(new Error('Not allowed by CORS')); // proper error
+      console.log("❌ Blocked:", origin);
+      callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true,
