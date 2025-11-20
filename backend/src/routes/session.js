@@ -59,6 +59,8 @@ router.post('/sessionLogin', async (req, res) => {
       httpOnly: true,
       secure: true,
       sameSite: 'None',
+      domain: '.novafuze.in',  // CRITICAL: allows cookie to work on api.novafuze.in and novafuze.in
+      path: '/',
     };
 
     res.cookie(process.env.SESSION_COOKIE_NAME, sessionCookie, options);
