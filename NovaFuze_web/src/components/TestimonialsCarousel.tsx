@@ -177,14 +177,13 @@ export function TestimonialsCarousel({ showAdminControls = false }: Testimonials
                 className="flex transition-transform duration-700 ease-in-out"
                 style={{ 
                   transform: `translateX(-${currentSlide * (100 / slidesPerView)}%)`,
-                  width: `${(approvedTestimonials.length / slidesPerView) * 100}%`
                 }}
               >
                 {approvedTestimonials.map((testimonial) => (
                   <div 
                     key={testimonial.id} 
-                    className="px-4"
-                    style={{ width: `${100 / approvedTestimonials.length}%` }}
+                    className="px-4 flex-shrink-0"
+                    style={{ width: `${100 / slidesPerView}%` }}
                   >
                     <div className="relative">
                       {/* Speech Bubble Card */}

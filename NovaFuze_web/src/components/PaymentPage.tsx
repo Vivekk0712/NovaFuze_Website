@@ -21,7 +21,7 @@ const PaymentPage = () => {
 
     const productDetails = {
         name: 'LiveEazy',
-        price: 2,
+        price: 499,
         currency: 'INR',
         features: [
             'Smart home integration',

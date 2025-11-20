@@ -143,7 +143,7 @@ export function ProductsGridSection() {
                           {formatPrice(product.price, product.currency)}
                         </span>
                         {product.price > 0 && (
-                          <span className="text-sm text-muted-foreground ml-2">/month</span>
+                          <span className="text-sm text-muted-foreground ml-2">INR/(one-time)</span>
                         )}
                       </div>
                       {getStatusBadge(product.price)}

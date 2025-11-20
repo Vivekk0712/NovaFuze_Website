@@ -6,8 +6,8 @@ export function TermsOfServicePage() {
     <div className="py-24 bg-background">
       <div className="container mx-auto px-4 lg:px-8 max-w-4xl">
         {/* Back Navigation */}
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           className="mb-8 p-0 h-auto hover:bg-transparent text-[#4E6BDF] hover:text-[#3D51D3]"
           onClick={() => window.history.back()}
         >
@@ -29,7 +29,7 @@ export function TermsOfServicePage() {
         <div className="prose prose-lg max-w-none">
           <div className="bg-muted/50 p-6 rounded-lg mb-8">
             <p className="text-sm text-muted-foreground mb-0">
-              <strong>Agreement:</strong> By accessing and using NovaFuze's website and services, 
+              <strong>Agreement:</strong> By accessing and using NovaFuze's website and services,
               you agree to be bound by these Terms of Service and all applicable laws and regulations.
             </p>
           </div>
@@ -37,8 +37,8 @@ export function TermsOfServicePage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4 text-foreground">1. Acceptance of Terms</h2>
             <p className="mb-4">
-              These Terms of Service ("Terms") govern your use of NovaFuze's website, products, and services. 
-              By accessing or using our services, you acknowledge that you have read, understood, and agree 
+              These Terms of Service ("Terms") govern your use of NovaFuze's website, products, and services.
+              By accessing or using our services, you acknowledge that you have read, understood, and agree
               to be bound by these Terms.
             </p>
           </section>
@@ -76,8 +76,8 @@ export function TermsOfServicePage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4 text-foreground">4. Service Availability</h2>
             <p className="mb-4">
-              While we strive to maintain continuous service availability, we do not guarantee 
-              uninterrupted access to our services. We reserve the right to modify, suspend, 
+              While we strive to maintain continuous service availability, we do not guarantee
+              uninterrupted access to our services. We reserve the right to modify, suspend,
               or discontinue services at any time with reasonable notice.
             </p>
           </section>
@@ -85,7 +85,7 @@ export function TermsOfServicePage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4 text-foreground">5. Intellectual Property Rights</h2>
             <p className="mb-4">
-              All content, features, and functionality on our website and services are owned by 
+              All content, features, and functionality on our website and services are owned by
               NovaFuze and are protected by intellectual property laws:
             </p>
             <ul className="list-disc pl-6 space-y-2">
@@ -113,7 +113,7 @@ export function TermsOfServicePage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4 text-foreground">7. Privacy and Data Protection</h2>
             <p className="mb-4">
-              Your privacy is important to us. Our data collection and processing practices 
+              Your privacy is important to us. Our data collection and processing practices
               are governed by our Privacy Policy, which forms an integral part of these Terms.
             </p>
           </section>
@@ -134,7 +134,7 @@ export function TermsOfServicePage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4 text-foreground">9. Indemnification</h2>
             <p className="mb-4">
-              You agree to indemnify and hold NovaFuze harmless from any claims, damages, or 
+              You agree to indemnify and hold NovaFuze harmless from any claims, damages, or
               expenses arising from your use of our services or violation of these Terms.
             </p>
           </section>
@@ -142,7 +142,7 @@ export function TermsOfServicePage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4 text-foreground">10. Termination</h2>
             <p className="mb-4">
-              We may terminate or suspend access to our services immediately, without prior notice, 
+              We may terminate or suspend access to our services immediately, without prior notice,
               for conduct that we believe violates these Terms or is harmful to other users or us.
             </p>
           </section>
@@ -150,16 +150,16 @@ export function TermsOfServicePage() {
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4 text-foreground">11. Governing Law</h2>
             <p className="mb-4">
-              These Terms are governed by and construed in accordance with the laws of India. 
-              Any disputes shall be subject to the exclusive jurisdiction of courts in [City], India.
+              These Terms are governed by and construed in accordance with the laws of India.
+              Any disputes shall be subject to the exclusive jurisdiction of courts in Bangalore, India.
             </p>
           </section>
 
           <section className="mb-8">
             <h2 className="text-2xl font-semibold mb-4 text-foreground">12. Changes to Terms</h2>
             <p className="mb-4">
-              We reserve the right to modify these Terms at any time. Material changes will be 
-              communicated through our website or email. Continued use of our services constitutes 
+              We reserve the right to modify these Terms at any time. Material changes will be
+              communicated through our website or email. Continued use of our services constitutes
               acceptance of modified Terms.
             </p>
           </section>
@@ -180,7 +180,7 @@ export function TermsOfServicePage() {
 
           <section className="text-center pt-8 border-t">
             <p className="text-sm text-muted-foreground">
-              These Terms of Service are governed by the laws of India and comply with applicable 
+              These Terms of Service are governed by the laws of India and comply with applicable
               Indian business and consumer protection regulations.
             </p>
           </section>

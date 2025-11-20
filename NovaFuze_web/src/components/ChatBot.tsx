@@ -97,6 +97,12 @@ const ChatBot = ({ user }: ChatBotProps) => {
     e.preventDefault();
     if (!message.trim()) return;
 
+    // Check if user is logged in
+    if (!user) {
+      window.location.hash = '#login';
+      return;
+    }
+
     const userMessage = { role: 'user', content: message, timestamp: new Date().toISOString() };
     const newChatHistory = [...chatHistory, userMessage];
 
@@ -161,6 +167,11 @@ const ChatBot = ({ user }: ChatBotProps) => {
       <button
         onClick={() => {
           console.log('ChatBot button clicked!', isOpen);
+          if (!user && !isOpen) {
+            // Redirect to login if not logged in
+            window.location.hash = '#login';
+            return;
+          }
           setIsOpen(!isOpen);
         }}
         className={`fixed bottom-6 right-6 rounded-full text-white shadow-2xl hover:shadow-3xl transition-all duration-300 cursor-pointer ${isOpen ? 'w-12 h-12' : 'w-14 h-14 hover:scale-110'

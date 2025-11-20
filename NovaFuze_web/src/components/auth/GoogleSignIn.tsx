@@ -1,14 +1,42 @@
-import React, { useState } from 'react';
-import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import React, { useState, useEffect } from 'react';
+import { GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult } from 'firebase/auth';
 import { auth } from '../../firebaseClient';
 import { sessionLogin } from '../../services/authApi';
 import { Button, Alert } from 'react-bootstrap';
 import { motion } from 'framer-motion';
 import { Loader2 } from 'lucide-react';
 
+// Detect if user is on mobile device
+const isMobileDevice = () => {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+         (window.innerWidth <= 768);
+};
+
 const GoogleSignIn = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Handle redirect result on component mount (for mobile Google sign-in)
+  useEffect(() => {
+    const handleRedirectResult = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result) {
+          const idToken = await result.user.getIdToken();
+          await sessionLogin(idToken);
+          window.location.hash = '#home';
+          window.location.reload();
+        }
+      } catch (error: any) {
+        console.error('Redirect sign in error:', error);
+        if (error.code !== 'auth/popup-closed-by-user') {
+          setError('Failed to sign in with Google. Please try again.');
+        }
+      }
+    };
+
+    handleRedirectResult();
+  }, []);
 
   const handleSignIn = async () => {
     setError(null);
@@ -25,11 +53,17 @@ const GoogleSignIn = () => {
         prompt: 'select_account'
       });
       
-      const userCredential = await signInWithPopup(auth, provider);
-      const idToken = await userCredential.user.getIdToken();
-      await sessionLogin(idToken);
-      window.location.hash = '#home';
-      window.location.reload();
+      // Use redirect for mobile devices, popup for desktop
+      if (isMobileDevice()) {
+        await signInWithRedirect(auth, provider);
+        // The redirect will happen, and we'll handle the result in useEffect
+      } else {
+        const userCredential = await signInWithPopup(auth, provider);
+        const idToken = await userCredential.user.getIdToken();
+        await sessionLogin(idToken);
+        window.location.hash = '#home';
+        window.location.reload();
+      }
     } catch (error: any) {
       console.error('Google sign-in error:', error);
       
@@ -43,7 +77,6 @@ const GoogleSignIn = () => {
       } else {
         setError('Failed to sign in with Google. Please try again.');
       }
-    } finally {
       setIsLoading(false);
     }
   };

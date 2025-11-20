@@ -4,11 +4,17 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '../firebaseClient';
 import { sessionLogin } from '../services/authApi';
 import { toast } from 'sonner';
 import novaFuzeLogo from '../assets/b8120387b6ec249e0e1c5e71a9f6e337f9f42039.png';
+
+// Detect if user is on mobile device
+const isMobileDevice = () => {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+         (window.innerWidth <= 768);
+};
 
 const LoginPage = () => {
   // Check if we're on signup page based on hash
@@ -36,6 +42,28 @@ const LoginPage = () => {
 
     window.addEventListener('hashchange', handleHashChange);
     return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  // Handle redirect result on component mount (for mobile Google sign-in)
+  useEffect(() => {
+    const handleRedirectResult = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result) {
+          const idToken = await result.user.getIdToken();
+          await sessionLogin(idToken);
+          toast.success('Welcome!');
+          window.location.href = window.location.origin;
+        }
+      } catch (error: any) {
+        console.error('Redirect sign in error:', error);
+        if (error.code !== 'auth/popup-closed-by-user') {
+          toast.error('Failed to sign in with Google');
+        }
+      }
+    };
+
+    handleRedirectResult();
   }, []);
 
   const handleGoogleSignIn = async () => {

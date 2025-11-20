@@ -31,7 +31,7 @@ export function ServicesGridSection() {
         "Database Design"
       ],
       technologies: ["React", "Next.js", "TypeScript", "Node.js", "PostgreSQL"],
-      pricing: "Starting from ₹50,000",
+      pricing: "₹50,000",
       deliveryTime: "2-8 weeks",
       link: "/services/web-development"
     },
@@ -50,7 +50,7 @@ export function ServicesGridSection() {
         "Push Notifications"
       ],
       technologies: ["React Native", "Flutter", "Swift", "Kotlin", "Electron"],
-      pricing: "Starting from ₹80,000",
+      pricing: "₹80,000",
       deliveryTime: "4-12 weeks",
       link: "/services/application-development"
     },
@@ -69,7 +69,7 @@ export function ServicesGridSection() {
         "Data Intelligence"
       ],
       technologies: ["Python", "TensorFlow", "OpenAI", "LangChain", "FastAPI"],
-      pricing: "Starting from ₹1,20,000",
+      pricing: "₹1,20,000",
       deliveryTime: "6-16 weeks",
       link: "/services/ai-solutions"
     },
@@ -88,7 +88,7 @@ export function ServicesGridSection() {
         "Responsive Design"
       ],
       technologies: ["Figma", "Adobe XD", "Sketch", "Principle", "InVision"],
-      pricing: "Starting from ₹40,000",
+      pricing: "₹40,000",
       deliveryTime: "2-6 weeks",
       link: "/services/ui-ux-design"
     },
@@ -107,7 +107,7 @@ export function ServicesGridSection() {
         "Security Features"
       ],
       technologies: ["Shopify", "WooCommerce", "Magento", "Stripe", "PayPal"],
-      pricing: "Starting from ₹75,000",
+      pricing: "₹75,000",
       deliveryTime: "4-10 weeks",
       link: "/services/ecommerce-solutions"
     },
@@ -126,7 +126,7 @@ export function ServicesGridSection() {
         "Scalability Planning"
       ],
       technologies: ["AWS", "Azure", "Docker", "Kubernetes", "Microservices"],
-      pricing: "Starting from ₹25,000",
+      pricing: "₹25,000",
       deliveryTime: "1-4 weeks",
       link: "/services/consulting"
     }
@@ -180,7 +180,7 @@ export function ServicesGridSection() {
 
                   <div className="text-sm text-muted-foreground">
                     <div className="flex items-center justify-between mb-1">
-                      <span>Starting from:</span>
+                      <span>Price:</span>
                       <span className="font-semibold text-[#4E6BDF]">{service.pricing}</span>
                     </div>
                     <div className="flex items-center justify-between">

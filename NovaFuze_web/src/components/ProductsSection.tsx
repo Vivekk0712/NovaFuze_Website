@@ -37,7 +37,7 @@ export function ProductsSection() {
             Innovative Solutions
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Discover our range of cutting-edge SaaS products designed to streamline your 
+            Discover our range of cutting-edge SaaS products designed to streamline your
             business operations and accelerate growth through intelligent automation.
           </p>
         </div>
@@ -45,13 +45,13 @@ export function ProductsSection() {
         {/* Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
           {products.map((product, index) => (
-            <Card 
-              key={product.id} 
+            <Card
+              key={product.id}
               className="group relative overflow-hidden border-0 shadow-xl bg-white/80 backdrop-blur-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 rounded-2xl"
             >
               {/* Background Pattern */}
               <div className="absolute inset-0 bg-gradient-to-br from-[#4E6BDF]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              
+
               {/* Floating Elements */}
               <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
                 <div className="h-8 w-8 rounded-full bg-[#4E6BDF]/10 flex items-center justify-center">
@@ -67,7 +67,7 @@ export function ProductsSection() {
                     alt={product.name}
                     className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  
+
                   {/* Status Badge */}
                   <div className="absolute top-4 left-4">
                     <Badge className={`${product.price === 0 ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-emerald-100 text-emerald-800 border-emerald-200'} border shadow-sm`}>
@@ -97,7 +97,7 @@ export function ProductsSection() {
                       ))}
                     </div>
                   </div>
-                  
+
                   <CardDescription className="text-base leading-relaxed text-muted-foreground mb-6">
                     {product.description}
                   </CardDescription>
@@ -107,9 +107,9 @@ export function ProductsSection() {
                     <p className="text-sm font-semibold text-[#4E6BDF] mb-3">Key Features:</p>
                     <div className="flex flex-wrap gap-2">
                       {product.features.slice(0, 3).map((feature, featureIndex) => (
-                        <Badge 
-                          key={featureIndex} 
-                          variant="secondary" 
+                        <Badge
+                          key={featureIndex}
+                          variant="secondary"
                           className="bg-[#F1F4FD] text-[#4E6BDF] hover:bg-[#4E6BDF] hover:text-white transition-colors duration-200 text-xs"
                         >
                           {feature}
@@ -132,14 +132,14 @@ export function ProductsSection() {
                         {formatPrice(product.price, product.currency)}
                       </span>
                       {product.price > 0 && (
-                        <span className="text-sm text-muted-foreground ml-2">/month</span>
+                        <span className="text-sm text-muted-foreground ml-2">INR/(one-time)</span>
                       )}
                     </div>
                   </div>
 
                   {/* CTA Buttons */}
                   <div className="flex gap-3">
-                    <Button 
+                    <Button
                       className="flex-1 bg-[#4E6BDF] hover:bg-[#3D51D3] text-white group-hover:shadow-lg transition-all duration-300"
                       onClick={() => {
                         if (product.price === 0) {
@@ -154,9 +154,9 @@ export function ProductsSection() {
                       {product.price === 0 ? 'Learn More' : 'Get Started'}
                       <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                     </Button>
-                    
-                    <Button 
-                      variant="outline" 
+
+                    <Button
+                      variant="outline"
                       size="icon"
                       className="border-[#4E6BDF] text-[#4E6BDF] hover:bg-[#4E6BDF] hover:text-white transition-colors duration-300"
                       onClick={() => window.location.hash = 'contact'}
@@ -182,8 +182,8 @@ export function ProductsSection() {
             <p className="text-muted-foreground max-w-md">
               Explore our complete product suite and discover how we can help accelerate your growth.
             </p>
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               className="bg-gradient-to-r from-[#4E6BDF] to-[#6B73FF] hover:from-[#3D51D3] to-[#5A64F5] text-white shadow-lg hover:shadow-xl transition-all duration-300"
               onClick={() => window.location.hash = 'products'}
             >

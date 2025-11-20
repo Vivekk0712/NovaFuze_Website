@@ -9,17 +9,30 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 const corsOptions = {
-  origin: [
-    'https://novafuze.in',                 // Production frontend (YOUR DOMAIN!)
-    'https://www.novafuze.in',             // WWW version
-    'https://fire-auth-mcp.netlify.app', // Old production frontend
-    'http://localhost:5173',             // Local testing
-    'http://localhost:5174',             // NovaFuze local testing
-    'http://localhost:3000',             // Vite v6 default port
-  ],
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      'https://novafuze.in',
+      'https://www.novafuze.in',
+      'https://fire-auth-mcp.netlify.app',
+      'http://localhost:5173',
+      'http://localhost:5174',
+      'http://localhost:3000',
+    ];
+    
+    // Allow requests with no origin (like mobile apps, Postman, curl)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.log('CORS blocked origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 200
 };
 
 app.use(cors(corsOptions));
